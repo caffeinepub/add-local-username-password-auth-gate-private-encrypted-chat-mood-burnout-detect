@@ -1,60 +1,47 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Prevent initial-load crash from unsafe history.state usage and improve ErrorBoundary diagnostics",
+  "title": "Rename final CTA to “Subscription plans” and add Subscription Plans screen",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Eliminate the immediate-on-open runtime crash so the landing page reliably renders on first load and hard refresh.",
+      "summary": "Rename the landing page final CTA secondary button to “Subscription plans” and navigate to a new Subscription Plans screen via client-side navigation without breaking the existing experience flow.",
       "acceptanceCriteria": [
-        "Opening the app in a fresh tab (no prior navigation) renders the landing page instead of the ErrorBoundary fallback.",
-        "Hard-refresh (Ctrl/Cmd+Shift+R) does not crash on initial render.",
-        "The fix specifically prevents runtime exceptions during initial navigation/history state initialization."
+        "On the landing page near the end (Final CTA section), the secondary CTA button text reads exactly “Subscription plans”.",
+        "Clicking “Subscription plans” navigates the user to a Subscription Plans screen without a full page reload.",
+        "Navigation does not break the existing “Start MindVault” / experience flow."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useExperienceNavigationState.ts",
+          "path": "frontend/src/components/sections/FinalCTASection.tsx",
           "operation": "modify",
-          "description": "Make initial mount initialization resilient: guard all reads/writes of window.history.state so no exceptions occur during first render, and ensure isInitialized is always set even when history.state is missing or invalid (prevents the landing page from being blocked by a crash)."
+          "description": "Update the secondary CTA button label text to exactly “Subscription plans” and make it clickable by wiring it to a new callback prop (e.g., onSubscriptionPlans) provided by the landing page. Keep the existing Start MindVault button behavior unchanged."
         },
         {
           "path": "frontend/src/pages/MindVaultLandingPage.tsx",
           "operation": "modify",
-          "description": "Add a safe fail-open behavior for first paint: if navigation-state initialization is delayed/unavailable for any reason, ensure the landing content can still render without throwing (keep existing UX otherwise)."
+          "description": "Introduce client-side screen state for showing the new Subscription Plans view (in addition to the existing experience view), add a handler that opens Subscription Plans and pass it down to FinalCTASection. Use browser history state (pushState + popstate handling) so navigation works without a full reload and back navigation returns appropriately, without interfering with the existing Start MindVault/experience back behavior."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Harden useExperienceNavigationState history synchronization: never throw on null/non-object history.state and preserve existing state fields when setting mindvault_experience.",
+      "summary": "Create a Subscription Plans page/screen showing the three pricing options and a prominent “first session is entirely free” note, with a clear way to return to the landing page.",
       "acceptanceCriteria": [
-        "When window.history.state is null/undefined, the hook initializes without throwing and writes a valid state via replaceState.",
-        "When window.history.state is an object, the hook keeps existing keys and only adds/updates the mindvault_experience key.",
-        "Open/close cycles of the Experience view still work (openExperience sets state true; closeExperience returns to landing) without crashing.",
-        "Back/forward navigation updates isExperienceOpen correctly without throwing."
+        "The Subscription Plans page shows three plans with prices exactly: “₹200”, “₹800”, and “₹1600”, and includes the corresponding session/time descriptions.",
+        "The page includes user-facing text that communicates: “The first session is entirely free.”",
+        "The Subscription Plans page provides a clear way to return to the landing page (e.g., a “Go back” control)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useExperienceNavigationState.ts",
-          "operation": "modify",
-          "description": "Implement safe history state merging: treat non-object history.state (null, undefined, primitives) as an empty object; preserve any existing history.state keys when calling replaceState/pushState; and harden popstate handling so event.state null/non-object cannot cause crashes while still updating isExperienceOpen correctly."
-        }
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "summary": "Improve ErrorBoundary fallback diagnostics by allowing users to optionally reveal technical error details without changing the existing user-facing message meaning.",
-      "acceptanceCriteria": [
-        "The ErrorBoundary fallback still shows the same headline, body copy, and \"Try Again\" button text.",
-        "The fallback provides an optional way to view technical details (at minimum: error name/message and a short stack excerpt if available).",
-        "Technical details are not shown by default; users must expand/reveal them.",
-        "Error details shown match the actual thrown error captured by the ErrorBoundary state."
-      ],
-      "file_operations": [
+          "path": "frontend/src/pages/SubscriptionPlansPage.tsx",
+          "operation": "create",
+          "description": "Create a new Subscription Plans screen component that displays: Single session ₹200; ₹800 for 4 sessions in a month; ₹1600 for 12 sessions in 3 months; plus prominent text: “The first session is entirely free.” Use existing layout/primitives (e.g., Section, GlassCard, Callout) for consistent styling, and include a clear “Go back” control (use the existing GoBackButton component)."
+        },
         {
-          "path": "frontend/src/components/system/ErrorBoundary.tsx",
+          "path": "frontend/src/pages/MindVaultLandingPage.tsx",
           "operation": "modify",
-          "description": "Extend the fallback UI to include a collapsed-by-default technical details section (e.g., native details/summary) that shows the captured error name/message and a short stack excerpt when available, while keeping the existing headline/body copy and \"Try Again\" button text unchanged in meaning."
+          "description": "Wire the new SubscriptionPlansPage into the app by rendering it when the subscription-plans screen state is active, and pass an onGoBack handler that returns the user to the landing content without a full reload (and plays nicely with existing experience view transitions)."
         }
       ]
     }

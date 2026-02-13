@@ -2,10 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-fix-the-app-s-immediate-on-open-crash-that-triggers-the-errorboundary-fallback-screen-something-unexpected-happened-so-the-landing-page-reliably-renders-on-first-load",
-      "featureTitle": "Fix the app’s immediate-on-open crash that triggers the ErrorBoundary fallback screen (\"Something unexpected happened\") so the landing page reliably renders on first load.",
+      "featureId": "feature-update-the-landing-page-final-cta-button-label-from-for-organizations-to-subscription-plans-and-make-it-navigable-clickable-to-a-new-subscription-plans-view-page",
+      "featureTitle": "Update the landing page final CTA button label from “For Organizations” to “Subscription plans” and make it navigable (clickable) to a new Subscription Plans view/page.",
       "files": [
-        "frontend/src/hooks/useExperienceNavigationState.ts",
+        "frontend/src/components/sections/FinalCTASection.tsx",
         "frontend/src/pages/MindVaultLandingPage.tsx"
       ],
       "components": [
@@ -22,10 +22,11 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-harden-browser-history-state-synchronization-in-useexperiencenavigationstate-so-it-never-throws-when-window-history-state-is-null-or-a-non-object-and-it-preserves-any-existing-history-state-fields-when-adding-the-mindvault-experience-flag",
-      "featureTitle": "Harden browser history state synchronization in useExperienceNavigationState so it never throws when window.history.state is null or a non-object, and it preserves any existing history.state fields when adding the mindvault_experience flag.",
+      "featureId": "feature-create-a-new-subscription-plans-page-screen-that-clearly-displays-single-session-200-800-for-4-sessions-in-a-month-1600-for-12-sessions-in-3-months-and-a-prominent-note-that-the-first-session-is-entirely-free",
+      "featureTitle": "Create a new Subscription Plans page/screen that clearly displays: Single session ₹200; ₹800 for 4 sessions in a month; ₹1600 for 12 sessions in 3 months; and a prominent note that the first session is entirely free.",
       "files": [
-        "frontend/src/hooks/useExperienceNavigationState.ts"
+        "frontend/src/pages/MindVaultLandingPage.tsx",
+        "frontend/src/pages/SubscriptionPlansPage.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -37,25 +38,6 @@
       ],
       "testIds": [
         "REQ-2"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-improve-crash-diagnostics-when-the-errorboundary-is-hit-by-surfacing-the-underlying-runtime-error-details-in-the-ui-in-a-non-intrusive-way-while-keeping-the-existing-user-facing-message-text-in-english-and-unchanged-in-meaning",
-      "featureTitle": "Improve crash diagnostics when the ErrorBoundary is hit by surfacing the underlying runtime error details in the UI in a non-intrusive way while keeping the existing user-facing message text in English and unchanged in meaning.",
-      "files": [
-        "frontend/src/components/system/ErrorBoundary.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0"
-      ],
-      "testIds": [
-        "REQ-3"
       ],
       "confidence": "high"
     }

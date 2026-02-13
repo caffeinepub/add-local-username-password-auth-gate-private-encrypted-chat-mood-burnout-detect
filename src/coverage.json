@@ -1,48 +1,39 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-13T12:44:43.737Z",
+  "generatedAt": "2026-02-13T15:38:25.417Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
-    "implemented": 3,
+    "total": 2,
+    "implemented": 2,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Fix the app’s immediate-on-open crash that triggers the ErrorBoundary fallback screen (\"Something unexpected happened\") so the landing page reliably renders on first load.",
+        "summary": "Update the landing page final CTA button label from “For Organizations” to “Subscription plans” and make it navigable (clickable) to a new Subscription Plans view/page.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useExperienceNavigationState.ts",
+          "frontend/src/components/sections/FinalCTASection.tsx",
           "frontend/src/pages/MindVaultLandingPage.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/hooks/useExperienceNavigationState.ts",
+          "frontend/src/components/sections/FinalCTASection.tsx",
           "frontend/src/pages/MindVaultLandingPage.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Harden browser history state synchronization in useExperienceNavigationState so it never throws when window.history.state is null or a non-object, and it preserves any existing history.state fields when adding the mindvault_experience flag.",
+        "summary": "Create a new Subscription Plans page/screen that clearly displays: Single session ₹200; ₹800 for 4 sessions in a month; ₹1600 for 12 sessions in 3 months; and a prominent note that the first session is entirely free.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useExperienceNavigationState.ts"
+          "frontend/src/pages/SubscriptionPlansPage.tsx",
+          "frontend/src/pages/MindVaultLandingPage.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/hooks/useExperienceNavigationState.ts"
-        ]
-      },
-      {
-        "id": "REQ-3",
-        "summary": "Improve crash diagnostics when the ErrorBoundary is hit by surfacing the underlying runtime error details in the UI in a non-intrusive way while keeping the existing user-facing message text in English and unchanged in meaning.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/system/ErrorBoundary.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/system/ErrorBoundary.tsx"
+          "frontend/src/pages/SubscriptionPlansPage.tsx",
+          "frontend/src/pages/MindVaultLandingPage.tsx"
         ]
       }
     ]
@@ -52,9 +43,9 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/system/ErrorBoundary.tsx",
-    "frontend/src/hooks/useExperienceNavigationState.ts",
+    "frontend/src/components/sections/FinalCTASection.tsx",
     "frontend/src/pages/MindVaultLandingPage.tsx",
+    "frontend/src/pages/SubscriptionPlansPage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

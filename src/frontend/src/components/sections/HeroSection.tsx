@@ -31,7 +31,7 @@ export default function HeroSection({ onStartAnonymously }: HeroSectionProps) {
     >
       {/* Animated gradient background - Light theme */}
       <div
-        className="absolute inset-0 opacity-40"
+        className="absolute inset-0 opacity-40 z-0"
         style={{
           background: 'linear-gradient(135deg, oklch(98% 0.02 260) 0%, oklch(96% 0.03 280) 50%, oklch(97% 0.02 240) 100%)',
           backgroundSize: '200% 200%',
@@ -40,11 +40,8 @@ export default function HeroSection({ onStartAnonymously }: HeroSectionProps) {
         aria-hidden="true"
       />
 
-      {/* Neural particles overlay */}
-      <NeuralParticlesOverlay />
-
       {/* Background orbs - Reduced opacity for light theme */}
-      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+      <div className="absolute inset-0 pointer-events-none z-5" aria-hidden="true">
         <img
           src="/assets/generated/mindvault-orbs.dim_1200x800.png"
           alt=""
@@ -52,11 +49,15 @@ export default function HeroSection({ onStartAnonymously }: HeroSectionProps) {
         />
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 max-w-5xl mx-auto text-center space-y-8">
-        <h1 className="hero-headline text-foreground">
-          Your mind deserves privacy, care, and clarity.
+      {/* Content with enhanced readability */}
+      <div className="relative z-10 max-w-5xl mx-auto text-center space-y-8 hero-content-readable">
+        <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tight text-foreground mb-6">
+          MINDVAULT
         </h1>
+        
+        <h2 className="hero-headline text-foreground">
+          You deserve care too
+        </h2>
         
         <p className="hero-subtext text-muted-foreground max-w-2xl mx-auto">
           Anonymous AI support that listens, understands, and connects you to real help.
@@ -71,6 +72,9 @@ export default function HeroSection({ onStartAnonymously }: HeroSectionProps) {
           </Button>
         </div>
       </div>
+
+      {/* Neural particles overlay - Now above content with subtle blend */}
+      <NeuralParticlesOverlay />
     </section>
   );
 }

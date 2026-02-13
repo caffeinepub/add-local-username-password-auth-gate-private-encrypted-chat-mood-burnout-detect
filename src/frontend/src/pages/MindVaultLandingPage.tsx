@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import HeroSection from '../components/sections/HeroSection';
 import CoreEmotionalQuestionSection from '../components/sections/CoreEmotionalQuestionSection';
 import HowItWorksSection from '../components/sections/HowItWorksSection';
@@ -9,22 +9,46 @@ import FAQSection from '../components/sections/FAQSection';
 import FinalCTASection from '../components/sections/FinalCTASection';
 import Footer from '../components/layout/Footer';
 import ExperienceView from '../components/experience/ExperienceView';
+import SubscriptionPlansPage from './SubscriptionPlansPage';
 import ZoomPageTransition from '../components/motion/ZoomPageTransition';
 import ZoomInView from '../components/motion/ZoomInView';
-import { useExperienceNavigationState } from '../hooks/useExperienceNavigationState';
-import { setExperienceIntendedOpen } from '../utils/errorBoundaryDiagnostics';
+
+type ViewState = 'landing' | 'experience' | 'subscription-plans';
 
 export default function MindVaultLandingPage() {
-  const { isExperienceOpen, isInitialized, openExperience, closeExperience } = useExperienceNavigationState();
+  const [currentView, setCurrentView] = useState<ViewState>('landing');
 
-  // Update diagnostic flag whenever experience state changes
+  const handleOpenExperience = () => {
+    setCurrentView('experience');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Push a history state so browser back works
+    window.history.pushState({ view: 'experience' }, '', window.location.href);
+  };
+
+  const handleOpenSubscriptionPlans = () => {
+    setCurrentView('subscription-plans');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Push a history state so browser back works
+    window.history.pushState({ view: 'subscription-plans' }, '', window.location.href);
+  };
+
+  const handleBackToLanding = () => {
+    setCurrentView('landing');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Listen for browser back button
   useEffect(() => {
-    setExperienceIntendedOpen(isExperienceOpen);
-  }, [isExperienceOpen]);
+    const handlePopState = (event: PopStateEvent) => {
+      if (currentView !== 'landing') {
+        setCurrentView('landing');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
 
-  // Fail-open: render landing content even if initialization is delayed
-  // This prevents blank screens on initial load
-  const shouldShowLoading = !isInitialized;
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [currentView]);
 
   const landingContent = (
     <div className="min-h-screen bg-background text-foreground">
@@ -38,7 +62,7 @@ export default function MindVaultLandingPage() {
 
       <main id="main-content" className="relative">
         <ZoomInView>
-          <HeroSection onStartAnonymously={openExperience} />
+          <HeroSection onStartAnonymously={handleOpenExperience} />
         </ZoomInView>
         
         <ZoomInView>
@@ -66,7 +90,10 @@ export default function MindVaultLandingPage() {
         </ZoomInView>
         
         <ZoomInView>
-          <FinalCTASection onStartMindVault={openExperience} />
+          <FinalCTASection 
+            onStartMindVault={handleOpenExperience}
+            onSubscriptionPlans={handleOpenSubscriptionPlans}
+          />
         </ZoomInView>
       </main>
 
@@ -75,24 +102,21 @@ export default function MindVaultLandingPage() {
   );
 
   const experienceContent = (
-    <ExperienceView onClose={closeExperience} />
+    <ExperienceView onClose={handleBackToLanding} />
   );
 
-  // Show minimal loading state only if truly not initialized
-  if (shouldShowLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="w-16 h-16 border-4 border-muted border-t-accent rounded-full animate-spin mx-auto" />
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    );
+  const subscriptionPlansContent = (
+    <SubscriptionPlansPage onGoBack={handleBackToLanding} />
+  );
+
+  // Render based on current view
+  if (currentView === 'subscription-plans') {
+    return subscriptionPlansContent;
   }
 
   return (
     <ZoomPageTransition
-      showExperience={isExperienceOpen}
+      showExperience={currentView === 'experience'}
       landingContent={landingContent}
       experienceContent={experienceContent}
     />

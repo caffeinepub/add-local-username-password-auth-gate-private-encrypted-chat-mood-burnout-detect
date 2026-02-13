@@ -4,9 +4,10 @@ import { usePrefersReducedMotion } from '../../lib/usePrefersReducedMotion';
 
 interface FinalCTASectionProps {
   onStartMindVault?: () => void;
+  onSubscriptionPlans?: () => void;
 }
 
-export default function FinalCTASection({ onStartMindVault }: FinalCTASectionProps) {
+export default function FinalCTASection({ onStartMindVault, onSubscriptionPlans }: FinalCTASectionProps) {
   const { ref, isInView } = useInView({ threshold: 0.5 });
   const prefersReducedMotion = usePrefersReducedMotion();
 
@@ -37,8 +38,8 @@ export default function FinalCTASection({ onStartMindVault }: FinalCTASectionPro
           <Button variant="primary" size="lg" onClick={onStartMindVault}>
             Start MindVault
           </Button>
-          <Button variant="secondary" size="lg">
-            For Organizations
+          <Button variant="secondary" size="lg" onClick={onSubscriptionPlans}>
+            Subscription plans
           </Button>
         </div>
       </div>

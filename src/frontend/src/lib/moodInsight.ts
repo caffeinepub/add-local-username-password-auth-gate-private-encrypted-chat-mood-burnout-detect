@@ -1,48 +1,12 @@
 import { MoodCategory } from '../backend';
-import { pickRandomTemplate, getFallbackReassuranceTemplate, getFallbackInsightTemplate, getCategoryLabel } from './moodPresets';
+import { pickRandomTemplate, getFallbackTemplate } from './moodPresets';
 
 export interface MoodInsight {
   category: MoodCategory;
   categoryLabel: string;
   reassuranceMessage: string;
-  insightMessage?: string;
 }
 
-export interface MoodTemplateSelection {
-  reassurance: string;
-  insight: string;
-}
-
-/**
- * Select one reassurance and one insight from backend templates or fallbacks
- */
-export function selectMoodTemplates(
-  category: MoodCategory,
-  backendTemplates: { reassuranceTemplates: string[]; insightTemplates: string[] } | null
-): MoodTemplateSelection {
-  let reassurance: string;
-  let insight: string;
-
-  // Select reassurance
-  if (backendTemplates?.reassuranceTemplates && backendTemplates.reassuranceTemplates.length > 0) {
-    reassurance = pickRandomTemplate(backendTemplates.reassuranceTemplates);
-  } else {
-    reassurance = getFallbackReassuranceTemplate(category);
-  }
-
-  // Select insight
-  if (backendTemplates?.insightTemplates && backendTemplates.insightTemplates.length > 0) {
-    insight = pickRandomTemplate(backendTemplates.insightTemplates);
-  } else {
-    insight = getFallbackInsightTemplate(category);
-  }
-
-  return { reassurance, insight };
-}
-
-/**
- * Generate mood insight for display (legacy function for backward compatibility)
- */
 export function generateMoodInsight(
   category: MoodCategory,
   templates: string[] | null
@@ -53,14 +17,31 @@ export function generateMoodInsight(
     reassuranceMessage = pickRandomTemplate(templates);
   } else {
     // Fallback if templates are unavailable
-    reassuranceMessage = getFallbackReassuranceTemplate(category);
+    reassuranceMessage = getFallbackTemplate(category);
   }
 
-  const categoryLabel = getCategoryLabel(category);
+  const categoryLabel = getCategoryLabelForInsight(category);
 
   return {
     category,
     categoryLabel,
     reassuranceMessage,
   };
+}
+
+function getCategoryLabelForInsight(category: MoodCategory): string {
+  switch (category) {
+    case MoodCategory.anxiety:
+      return 'Anxiety';
+    case MoodCategory.depression:
+      return 'Depression';
+    case MoodCategory.stress:
+      return 'Stress';
+    case MoodCategory.positive:
+      return 'Positive';
+    case MoodCategory.neutral:
+      return 'Neutral';
+    default:
+      return 'Neutral';
+  }
 }

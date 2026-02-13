@@ -8,18 +8,8 @@ import { Loader2, Database, Plus } from 'lucide-react';
 import { useListEntries, useSubmitEntry, useGetTemplatesForCategory } from '@/hooks/useQueries';
 import { classifyFromEntry } from '@/lib/classifier/moodBurnoutRules';
 import { generateMoodInsight } from '@/lib/moodInsight';
-import { selectMoodTemplates } from '@/lib/moodInsight';
-import { getCategoryLabel } from '@/lib/moodPresets';
 import MoodInsightCallout from './MoodInsightCallout';
-import MoodPresetTemplatesCallout from './MoodPresetTemplatesCallout';
-import { MoodCategory } from '../../backend';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 
 export default function DataEntryPanel() {
   const [key, setKey] = useState('');
@@ -30,15 +20,9 @@ export default function DataEntryPanel() {
     categoryLabel: string;
     reassuranceMessage: string;
   } | null>(null);
-  
-  // Mood preset selector state
-  const [selectedMoodPreset, setSelectedMoodPreset] = useState<MoodCategory | null>(null);
 
   const { data: entries = [], isLoading, error } = useListEntries();
   const submitEntry = useSubmitEntry();
-  
-  // Fetch templates for selected mood preset
-  const { data: presetTemplates, isLoading: templatesLoading } = useGetTemplatesForCategory(selectedMoodPreset);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,6 +38,7 @@ export default function DataEntryPanel() {
       setValue('');
 
       // Generate and show insight
+      // Note: In production, fetch templates from backend
       const insight = generateMoodInsight(classification.category, null);
       setCurrentInsight(insight);
       setShowInsight(true);
@@ -77,27 +62,6 @@ export default function DataEntryPanel() {
     });
   };
 
-  // Generate preset templates display
-  const presetTemplatesDisplay = selectedMoodPreset ? (
-    templatesLoading ? (
-      <div className="flex items-center justify-center p-4 popup-surface rounded-lg">
-        <Loader2 className="w-5 h-5 animate-spin text-accent" />
-      </div>
-    ) : (
-      (() => {
-        const templates = selectMoodTemplates(selectedMoodPreset, presetTemplates ?? null);
-        return (
-          <MoodPresetTemplatesCallout
-            category={selectedMoodPreset}
-            categoryLabel={getCategoryLabel(selectedMoodPreset)}
-            reassurance={templates.reassurance}
-            insight={templates.insight}
-          />
-        );
-      })()
-    )
-  ) : null;
-
   return (
     <div className="flex flex-col h-full space-y-4">
       <div className="flex items-center gap-2 pb-2 border-b border-border/50">
@@ -105,7 +69,7 @@ export default function DataEntryPanel() {
         <h3 className="text-lg font-semibold text-foreground">Data Entry</h3>
       </div>
 
-      {/* Mood insight callout (after submission) */}
+      {/* Mood insight callout */}
       {showInsight && currentInsight && (
         <MoodInsightCallout
           category={currentInsight.category}
@@ -143,31 +107,6 @@ export default function DataEntryPanel() {
             disabled={submitEntry.isPending}
           />
         </div>
-
-        {/* Mood Preset Selector */}
-        <div className="space-y-2">
-          <Label htmlFor="mood-preset" className="text-sm font-medium">
-            Mood Preset (Optional)
-          </Label>
-          <Select
-            value={selectedMoodPreset || ''}
-            onValueChange={(value) => setSelectedMoodPreset(value as MoodCategory)}
-          >
-            <SelectTrigger id="mood-preset" className="bg-secondary/30 border-border/50">
-              <SelectValue placeholder="Select a mood to see guidance..." />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={MoodCategory.anxiety}>Anxiety</SelectItem>
-              <SelectItem value={MoodCategory.depression}>Depression</SelectItem>
-              <SelectItem value={MoodCategory.stress}>Stress</SelectItem>
-              <SelectItem value={MoodCategory.neutral}>Neutral</SelectItem>
-              <SelectItem value={MoodCategory.positive}>Positive</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Mood Preset Templates Display */}
-        {presetTemplatesDisplay}
 
         <Button
           type="submit"

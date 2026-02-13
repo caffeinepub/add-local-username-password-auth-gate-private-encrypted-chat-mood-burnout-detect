@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useState, useRef } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 import { ZOOM_CONFIG } from '@/lib/motion';
 
@@ -20,36 +20,23 @@ export default function ZoomPageTransition({
     showExperience ? 'experience' : 'landing'
   );
   const prefersReducedMotion = usePrefersReducedMotion();
-  const transitionTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     const targetView = showExperience ? 'experience' : 'landing';
-    
-    // Clear any pending transition timer to prevent race conditions
-    if (transitionTimerRef.current !== null) {
-      clearTimeout(transitionTimerRef.current);
-      transitionTimerRef.current = null;
-    }
     
     if (currentView !== targetView) {
       setIsTransitioning(true);
       
       const duration = prefersReducedMotion ? 150 : ZOOM_CONFIG.page.duration;
       
-      transitionTimerRef.current = window.setTimeout(() => {
+      const timer = setTimeout(() => {
         setCurrentView(targetView);
         setIsTransitioning(false);
-        transitionTimerRef.current = null;
         onTransitionComplete?.();
       }, duration);
-    }
 
-    return () => {
-      if (transitionTimerRef.current !== null) {
-        clearTimeout(transitionTimerRef.current);
-        transitionTimerRef.current = null;
-      }
-    };
+      return () => clearTimeout(timer);
+    }
   }, [showExperience, currentView, prefersReducedMotion, onTransitionComplete]);
 
   const getViewStyle = (view: 'landing' | 'experience') => {

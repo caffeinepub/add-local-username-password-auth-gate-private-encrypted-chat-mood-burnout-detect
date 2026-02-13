@@ -1,78 +1,54 @@
 {
   "kind": "build_request",
-  "title": "Fix immediate app-load crash causing ErrorBoundary fallback screen",
-  "priority": "high",
+  "title": "Rename “For Organizations” to “Subscription plans” and add a Subscription Plans page",
+  "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Fix the app’s immediate-on-open crash that triggers the ErrorBoundary fallback screen (\"Something unexpected happened\") so the landing page reliably renders on first load.",
+      "text": "Update the landing page final CTA button label from “For Organizations” to “Subscription plans” and make it navigable (clickable) to a new Subscription Plans view/page.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "recent-1"
         ],
         "quotes": [
-          "theres an issue in loading the page , fix it",
-          "everything, error message, happening before",
-          "immediately after opening the app4",
-          "start now"
+          "at the end of the page there is a option named \"for organizations\" change to \"Subscription plans\" and after we click on that take us to page of subscription plans"
         ]
       },
       "acceptanceCriteria": [
-        "Opening the app in a fresh tab (no prior navigation) renders the landing page instead of the ErrorBoundary fallback.",
-        "Hard-refresh (Ctrl/Cmd+Shift+R) does not crash on initial render.",
-        "The fix specifically prevents runtime exceptions during initial navigation/history state initialization."
+        "On the landing page near the end (Final CTA section), the secondary CTA button text reads exactly “Subscription plans”.",
+        "Clicking “Subscription plans” navigates the user to a Subscription Plans screen without a full page reload.",
+        "Navigation does not break the existing “Start MindVault” / experience flow."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Harden browser history state synchronization in useExperienceNavigationState so it never throws when window.history.state is null or a non-object, and it preserves any existing history.state fields when adding the mindvault_experience flag.",
+      "text": "Create a new Subscription Plans page/screen that clearly displays: Single session ₹200; ₹800 for 4 sessions in a month; ₹1600 for 12 sessions in 3 months; and a prominent note that the first session is entirely free.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "recent-1"
         ],
         "quotes": [
-          "App fails to load immediately on open; shows generic error: \"Something unexpected happened... We encountered an issue loading this page.\""
+          "starting from a single session 200 rupees , 800 rupees for 4 sessions in a month and 1600 rupees for 12 sessions  in 3 months. furthermore the first session will be entirely free"
         ]
       },
       "acceptanceCriteria": [
-        "When window.history.state is null/undefined, the hook initializes without throwing and writes a valid state via replaceState.",
-        "When window.history.state is an object, the hook keeps existing keys and only adds/updates the mindvault_experience key.",
-        "Open/close cycles of the Experience view still work (openExperience sets state true; closeExperience returns to landing) without crashing.",
-        "Back/forward navigation updates isExperienceOpen correctly without throwing."
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "Improve crash diagnostics when the ErrorBoundary is hit by surfacing the underlying runtime error details in the UI in a non-intrusive way while keeping the existing user-facing message text in English and unchanged in meaning.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "recent-1"
-        ],
-        "quotes": [
-          "Something unexpected happened",
-          "We encountered an issue loading this page. This isn't your fault—please try again."
-        ]
-      },
-      "acceptanceCriteria": [
-        "The ErrorBoundary fallback still shows the same headline, body copy, and \"Try Again\" button text.",
-        "The fallback provides an optional way to view technical details (at minimum: error name/message and a short stack excerpt if available).",
-        "Technical details are not shown by default; users must expand/reveal them.",
-        "Error details shown match the actual thrown error captured by the ErrorBoundary state."
+        "The Subscription Plans page shows three plans with prices exactly: “₹200”, “₹800”, and “₹1600”, and includes the corresponding session/time descriptions.",
+        "The page includes user-facing text that communicates: “The first session is entirely free.”",
+        "The Subscription Plans page provides a clear way to return to the landing page (e.g., a “Go back” control)."
       ]
     }
   ],
   "constraints": [
-    "Do not edit files in frontend immutablePaths (frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui).",
-    "Keep all user-facing text in English.",
-    "Backend remains single-actor Motoko; do not introduce additional backend services."
+    "Do not edit any files under frontend/src/components/ui (read-only).",
+    "Do not modify immutable hook/entry files listed in SYSTEM_CONTEXT (e.g., frontend/src/main.tsx, frontend/src/hooks/useActor.ts, frontend/src/hooks/useInternetIdentity.ts(x)).",
+    "Keep the backend as a single Motoko actor; no backend changes are required unless strictly necessary for this UI-only request."
   ],
   "nonGoals": [
-    "Adding new product features beyond fixing the load crash and improving related diagnostics.",
-    "Changing authentication flows (Internet Identity or Local Auth) unless required to resolve the crash.",
-    "Redesigning the landing page or Experience UI visuals beyond what is needed to fix the error state and diagnostics."
+    "Implementing payments, checkout, or Stripe integration.",
+    "Adding account/session tracking for plan purchases.",
+    "Creating organization-specific pricing or flows beyond the requested rename and subscription plans display."
   ],
   "imageRequirements": {
     "required": [],

@@ -147,12 +147,9 @@ export interface backendInterface {
         totalMessages: bigint;
         totalUsers: bigint;
     }>;
-    getTemplatesForCategory(category: MoodCategory): Promise<{
-        insightTemplates: Array<string>;
-        reassuranceTemplates: Array<string>;
-    } | null>;
+    getTemplatesForCategory(category: MoodCategory): Promise<Array<string>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
-    initializeMoodCategoryTemplates(): Promise<void>;
+    initialize(): Promise<void>;
     isCallerAdmin(): Promise<boolean>;
     listEntries(): Promise<Array<DataEntry>>;
     postEncryptedMessage(encryptedText: Uint8Array): Promise<void>;
@@ -350,21 +347,18 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async getTemplatesForCategory(arg0: MoodCategory): Promise<{
-        insightTemplates: Array<string>;
-        reassuranceTemplates: Array<string>;
-    } | null> {
+    async getTemplatesForCategory(arg0: MoodCategory): Promise<Array<string>> {
         if (this.processError) {
             try {
                 const result = await this.actor.getTemplatesForCategory(to_candid_MoodCategory_n15(this._uploadFile, this._downloadFile, arg0));
-                return from_candid_opt_n17(this._uploadFile, this._downloadFile, result);
+                return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getTemplatesForCategory(to_candid_MoodCategory_n15(this._uploadFile, this._downloadFile, arg0));
-            return from_candid_opt_n17(this._uploadFile, this._downloadFile, result);
+            return result;
         }
     }
     async getUserProfile(arg0: Principal): Promise<UserProfile | null> {
@@ -381,17 +375,17 @@ export class Backend implements backendInterface {
             return from_candid_opt_n8(this._uploadFile, this._downloadFile, result);
         }
     }
-    async initializeMoodCategoryTemplates(): Promise<void> {
+    async initialize(): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.initializeMoodCategoryTemplates();
+                const result = await this.actor.initialize();
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.initializeMoodCategoryTemplates();
+            const result = await this.actor.initialize();
             return result;
         }
     }
@@ -507,15 +501,6 @@ function from_candid_UserRole_n9(_uploadFile: (file: ExternalBlob) => Promise<Ui
     return from_candid_variant_n10(_uploadFile, _downloadFile, value);
 }
 function from_candid_opt_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [Principal]): Principal | null {
-    return value.length === 0 ? null : value[0];
-}
-function from_candid_opt_n17(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [{
-        insightTemplates: Array<string>;
-        reassuranceTemplates: Array<string>;
-    }]): {
-    insightTemplates: Array<string>;
-    reassuranceTemplates: Array<string>;
-} | null {
     return value.length === 0 ? null : value[0];
 }
 function from_candid_opt_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_UserProfile]): UserProfile | null {

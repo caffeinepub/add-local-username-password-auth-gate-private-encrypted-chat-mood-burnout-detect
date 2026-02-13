@@ -65,13 +65,22 @@ export default function NeuralParticlesOverlay() {
         particle.x = Math.max(0, Math.min(canvas.width, particle.x));
         particle.y = Math.max(0, Math.min(canvas.height, particle.y));
 
-        // Draw particle
-        ctx.fillStyle = 'rgba(34, 211, 238, 0.4)';
+        // Draw particle - Brighter and larger
+        ctx.fillStyle = 'rgba(34, 211, 238, 0.75)';
         ctx.beginPath();
-        ctx.arc(particle.x, particle.y, 2, 0, Math.PI * 2);
+        ctx.arc(particle.x, particle.y, 3.5, 0, Math.PI * 2);
         ctx.fill();
 
-        // Draw connections
+        // Add glow effect to particles
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = 'rgba(34, 211, 238, 0.6)';
+        ctx.fillStyle = 'rgba(34, 211, 238, 0.9)';
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Draw connections - Brighter and thicker
         particle.connections = [];
         for (let j = i + 1; j < particles.length; j++) {
           const other = particles[j];
@@ -81,9 +90,9 @@ export default function NeuralParticlesOverlay() {
 
           if (distance < maxDistance) {
             particle.connections.push(j);
-            const opacity = (1 - distance / maxDistance) * 0.15;
+            const opacity = (1 - distance / maxDistance) * 0.4;
             ctx.strokeStyle = `rgba(167, 139, 250, ${opacity})`;
-            ctx.lineWidth = 1;
+            ctx.lineWidth = 1.5;
             ctx.beginPath();
             ctx.moveTo(particle.x, particle.y);
             ctx.lineTo(other.x, other.y);
@@ -110,7 +119,8 @@ export default function NeuralParticlesOverlay() {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 pointer-events-none opacity-40"
+      className="absolute inset-0 pointer-events-none z-20"
+      style={{ mixBlendMode: 'screen', opacity: 0.7 }}
       aria-hidden="true"
     />
   );

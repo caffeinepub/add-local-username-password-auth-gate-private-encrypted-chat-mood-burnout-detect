@@ -7,7 +7,7 @@ import { useGetRecentEncryptedMessages, usePostEncryptedMessage, useGetTemplates
 import { useLocalAuth } from '@/hooks/useLocalAuth';
 import { encryptMessage, decryptMessage, bytesToEncryptedMessage, encryptedMessageToBytes } from '@/lib/crypto/e2ee';
 import { classifyMoodAndBurnout } from '@/lib/classifier/moodBurnoutRules';
-import { selectMoodTemplates } from '@/lib/moodInsight';
+import { generateMoodInsight } from '@/lib/moodInsight';
 import { cn } from '@/lib/utils';
 import TherapistPromptModal from './TherapistPromptModal';
 import { MoodCategory } from '../../backend';
@@ -30,9 +30,6 @@ export default function AnonymousChat() {
   const { data: encryptedMessages = [], isLoading, error } = useGetRecentEncryptedMessages(50);
   const postEncryptedMessage = usePostEncryptedMessage();
   const { encryptionKey } = useLocalAuth();
-  
-  // Fetch templates for the detected category
-  const { data: templates } = useGetTemplatesForCategory(detectedCategory);
 
   // Decrypt and process messages
   useEffect(() => {
@@ -42,74 +39,100 @@ export default function AnonymousChat() {
         return;
       }
 
-      const decrypted: DisplayMessage[] = [];
-      
+      const processed: DisplayMessage[] = [];
+
       for (const msg of encryptedMessages) {
-        try {
-          const encryptedPayload = bytesToEncryptedMessage(msg.encryptedText);
-          if (!encryptedPayload) continue;
-          
-          const plaintext = await decryptMessage(encryptedPayload, encryptionKey);
-          if (!plaintext) continue;
-          
-          decrypted.push({
+        const encrypted = bytesToEncryptedMessage(msg.encryptedText);
+        
+        if (encrypted) {
+          const decrypted = await decryptMessage(encrypted, encryptionKey);
+          processed.push({
             timestamp: msg.timestamp,
-            author: msg.author ? 'You' : 'System',
-            text: plaintext,
-            isSystem: !msg.author,
+            author: msg.author?.toString() || 'anonymous',
+            text: decrypted || '[Message encrypted - unable to decrypt]',
+            isEncrypted: !decrypted,
+          });
+        } else {
+          // Malformed encrypted message
+          processed.push({
+            timestamp: msg.timestamp,
+            author: msg.author?.toString() || 'anonymous',
+            text: '[Message encrypted - unable to decrypt]',
             isEncrypted: true,
           });
-        } catch (err) {
-          console.error('Failed to decrypt message:', err);
         }
       }
 
-      setDisplayMessages(decrypted);
+      setDisplayMessages(processed);
     };
 
     processMessages();
   }, [encryptedMessages, encryptionKey]);
 
-  // Auto-scroll to bottom
+  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [displayMessages]);
 
-  const handleSend = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
     if (!message.trim() || !encryptionKey) return;
-
+    
     try {
-      // Classify mood before sending
+      // Classify mood and burnout before encrypting
       const classification = classifyMoodAndBurnout(message);
       setDetectedCategory(classification.category);
 
-      // Encrypt and send user message
-      const encryptedPayload = await encryptMessage(message, encryptionKey);
-      const encryptedBytes = encryptedMessageToBytes(encryptedPayload);
-      
+      // Encrypt the message
+      const encrypted = await encryptMessage(message, encryptionKey);
+      const encryptedBytes = encryptedMessageToBytes(encrypted);
+
+      // Post encrypted message
       await postEncryptedMessage.mutateAsync(encryptedBytes);
       setMessage('');
 
-      // Use templates from the hook (already fetched)
-      const selectedTemplates = selectMoodTemplates(classification.category, templates || null);
+      // Fetch templates for the detected category and generate insight
+      setTimeout(async () => {
+        try {
+          // We'll fetch templates inline here since we need them immediately
+          // In a production app, you might want to prefetch all categories
+          const response = await fetch(`/api/templates/${classification.category}`);
+          let templates: string[] | null = null;
+          
+          if (response.ok) {
+            templates = await response.json();
+          }
 
-      // Send system reassurance message
-      const systemMessage = `💙 ${selectedTemplates.reassurance}`;
-      const encryptedSystemPayload = await encryptMessage(systemMessage, encryptionKey);
-      const encryptedSystemBytes = encryptedMessageToBytes(encryptedSystemPayload);
-      
-      await postEncryptedMessage.mutateAsync(encryptedSystemBytes);
+          const insight = generateMoodInsight(classification.category, templates);
+          const systemMessage = `**${insight.categoryLabel}**\n\n${insight.reassuranceMessage}`;
+          
+          const systemEncrypted = await encryptMessage(systemMessage, encryptionKey);
+          const systemEncryptedBytes = encryptedMessageToBytes(systemEncrypted);
+          
+          await postEncryptedMessage.mutateAsync(systemEncryptedBytes);
 
-      // Show therapist prompt if needed
-      if (classification.shouldPromptTherapist) {
-        setTimeout(() => {
-          setShowTherapistPrompt(true);
-        }, 1000);
-      }
+          // Show therapist prompt if needed
+          if (classification.shouldPromptTherapist) {
+            setTimeout(() => {
+              setShowTherapistPrompt(true);
+            }, 1000);
+          }
+        } catch (err) {
+          console.error('Failed to generate insight:', err);
+        }
+      }, 500);
     } catch (err) {
-      console.error('Failed to send message:', err);
+      console.error('Failed to post message:', err);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e);
     }
   };
 
@@ -126,16 +149,32 @@ export default function AnonymousChat() {
     setShowTherapistPrompt(false);
   };
 
+  // Show locked state if no encryption key
+  if (!encryptionKey) {
+    return (
+      <div className="flex flex-col h-full items-center justify-center space-y-4 text-center p-6">
+        <div className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center">
+          <Lock className="w-8 h-8 text-accent" />
+        </div>
+        <div className="space-y-2">
+          <h3 className="text-lg font-semibold text-foreground">Encryption Key Required</h3>
+          <p className="text-sm text-muted-foreground max-w-md">
+            Please sign in to generate a session encryption key. Your messages will be encrypted end-to-end.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center gap-2 pb-3 border-b border-border/50">
+    <div className="flex flex-col h-full space-y-4">
+      <div className="flex items-center gap-2 pb-2 border-b border-border/50">
         <MessageCircle className="w-5 h-5 text-accent" />
         <h3 className="text-lg font-semibold text-foreground">Anonymous Chat</h3>
-        <Lock className="w-4 h-4 text-muted-foreground ml-auto" />
       </div>
 
       {/* Messages area */}
-      <ScrollArea className="flex-1 py-4" ref={scrollRef}>
+      <ScrollArea className="flex-1 h-[400px] pr-4" ref={scrollRef}>
         {isLoading && (
           <div className="flex items-center justify-center h-full">
             <Loader2 className="w-8 h-8 animate-spin text-accent" />
@@ -149,80 +188,94 @@ export default function AnonymousChat() {
         )}
 
         {!isLoading && !error && displayMessages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-center space-y-2 px-4">
+          <div className="flex flex-col items-center justify-center h-full text-center space-y-2">
             <MessageCircle className="w-12 h-12 text-muted-foreground/50" />
-            <p className="text-muted-foreground">No messages yet. Start a conversation!</p>
-            <p className="text-xs text-muted-foreground/70">All messages are encrypted end-to-end</p>
+            <p className="text-muted-foreground">No messages yet. Be the first to share!</p>
+            <p className="text-xs text-muted-foreground">Your messages are encrypted end-to-end</p>
           </div>
         )}
 
         {!isLoading && !error && displayMessages.length > 0 && (
-          <div className="space-y-3 px-2">
-            {displayMessages.map((msg, index) => (
-              <div
-                key={`${msg.timestamp}-${index}`}
-                className={cn(
-                  'flex gap-2',
-                  msg.isSystem ? 'justify-start' : 'justify-end'
-                )}
-              >
-                {msg.isSystem && (
-                  <div className="shrink-0 w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center">
-                    <Bot className="w-4 h-4 text-accent" />
-                  </div>
-                )}
+          <div className="space-y-3">
+            {displayMessages.map((msg, index) => {
+              const isSystemMessage = msg.text.includes('**') || 
+                                     msg.text.includes('hear that you') || 
+                                     msg.text.includes('Thank you for sharing') ||
+                                     msg.text.includes('wonderful to hear');
+              
+              return (
                 <div
+                  key={`${msg.timestamp}-${index}`}
                   className={cn(
-                    'max-w-[75%] rounded-lg px-3 py-2 space-y-1',
-                    msg.isSystem
-                      ? 'bg-secondary/50 border border-border/30'
-                      : 'bg-accent text-accent-foreground'
+                    'p-3 rounded-2xl backdrop-blur-sm',
+                    isSystemMessage
+                      ? 'bg-accent/10 border border-accent/30'
+                      : 'bg-secondary/50 border border-border/30',
+                    msg.isEncrypted && 'opacity-50'
                   )}
                 >
-                  <p className="text-sm break-words whitespace-pre-wrap">{msg.text}</p>
-                  <span className="text-xs opacity-70">{formatTimestamp(msg.timestamp)}</span>
+                  <div className="flex items-baseline justify-between gap-2 mb-1">
+                    <span className={cn(
+                      'text-xs font-medium flex items-center gap-1',
+                      isSystemMessage ? 'text-accent' : 'text-accent'
+                    )}>
+                      {isSystemMessage && <Bot className="w-3 h-3" />}
+                      {isSystemMessage ? 'MindVault Assistant' : msg.author.slice(0, 8) + '...'}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {formatTimestamp(msg.timestamp)}
+                    </span>
+                  </div>
+                  <p className="text-sm text-foreground break-words whitespace-pre-wrap">
+                    {msg.text}
+                  </p>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </ScrollArea>
 
       {/* Input area */}
-      <div className="pt-3 border-t border-border/50 space-y-2">
+      <form onSubmit={handleSubmit} className="space-y-2">
         <Textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              handleSend();
-            }
-          }}
-          placeholder="Type your message... (Press Enter to send)"
+          onKeyDown={handleKeyDown}
+          placeholder="Type your message... (Press Enter to send, Shift+Enter for new line)"
           className="min-h-[80px] resize-none bg-secondary/30 border-border/50 focus:border-accent/50"
+          maxLength={280}
           disabled={postEncryptedMessage.isPending || !encryptionKey}
         />
-        <Button
-          onClick={handleSend}
-          disabled={!message.trim() || postEncryptedMessage.isPending || !encryptionKey}
-          className="w-full gap-2"
-        >
-          {postEncryptedMessage.isPending ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              Sending...
-            </>
-          ) : (
-            <>
-              <Send className="w-4 h-4" />
-              Send Message
-            </>
-          )}
-        </Button>
-      </div>
+        
+        <div className="flex items-center justify-between">
+          <span className={cn(
+            'text-xs',
+            message.length > 250 ? 'text-destructive' : 'text-muted-foreground'
+          )}>
+            {message.length}/280
+          </span>
+          
+          <Button
+            type="submit"
+            disabled={!message.trim() || postEncryptedMessage.isPending || !encryptionKey}
+            className="gap-2"
+          >
+            {postEncryptedMessage.isPending ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Sending...
+              </>
+            ) : (
+              <>
+                <Send className="w-4 h-4" />
+                Send
+              </>
+            )}
+          </Button>
+        </div>
+      </form>
 
-      {/* Therapist prompt modal */}
       <TherapistPromptModal
         open={showTherapistPrompt}
         onProceed={handleTherapistProceed}

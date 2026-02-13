@@ -107,16 +107,16 @@ export function useSubmitEntry() {
 }
 
 // Mood analysis preset hooks
-export function useGetTemplatesForCategory(category: MoodCategory | null) {
+export function useGetTemplatesForCategory(category: MoodCategory) {
   const { actor, isFetching } = useActor();
 
-  return useQuery<{ reassuranceTemplates: string[]; insightTemplates: string[] } | null>({
+  return useQuery<string[]>({
     queryKey: ['templates', category],
     queryFn: async () => {
-      if (!actor || !category) return null;
+      if (!actor) return [];
       return actor.getTemplatesForCategory(category);
     },
-    enabled: !!actor && !isFetching && !!category,
+    enabled: !!actor && !isFetching,
     staleTime: 1000 * 60 * 60, // Templates are stable, cache for 1 hour
   });
 }

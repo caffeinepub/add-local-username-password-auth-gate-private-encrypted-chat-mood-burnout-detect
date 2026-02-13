@@ -1,40 +1,37 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "New project",
+  "summary": "Project to update site footer link and add a Subscription Plans page with pricing tiers and first session free.",
   "architectural_notes": [],
-  "known_issues": [
-    "App fails to load immediately on open; shows generic error: \"Something unexpected happened... We encountered an issue loading this page.\""
-  ],
-  "isFixRequest": true,
+  "known_issues": [],
+  "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-fix-the-app-s-immediate-on-open-crash-that-triggers-the-errorboundary-fallback-screen-something-unexpected-happened-so-the-landing-page-reliably-renders-on-first-load",
-      "title": "Fix the app’s immediate-on-open crash that triggers the ErrorBoundary fallback screen (\"Something unexpected happened\") so the landing page reliably renders on first load.",
+      "id": "feature-update-the-landing-page-final-cta-button-label-from-for-organizations-to-subscription-plans-and-make-it-navigable-clickable-to-a-new-subscription-plans-view-page",
+      "title": "Update the landing page final CTA button label from “For Organizations” to “Subscription plans” and make it navigable (clickable) to a new Subscription Plans view/page.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-harden-browser-history-state-synchronization-in-useexperiencenavigationstate-so-it-never-throws-when-window-history-state-is-null-or-a-non-object-and-it-preserves-any-existing-history-state-fields-when-adding-the-mindvault-experience-flag",
-      "title": "Harden browser history state synchronization in useExperienceNavigationState so it never throws when window.history.state is null or a non-object, and it preserves any existing history.state fields when adding the mindvault_experience flag.",
+      "id": "feature-create-a-new-subscription-plans-page-screen-that-clearly-displays-single-session-200-800-for-4-sessions-in-a-month-1600-for-12-sessions-in-3-months-and-a-prominent-note-that-the-first-session-is-entirely-free",
+      "title": "Create a new Subscription Plans page/screen that clearly displays: Single session ₹200; ₹800 for 4 sessions in a month; ₹1600 for 12 sessions in 3 months; and a prominent note that the first session is entirely free.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
-    },
-    {
-      "id": "feature-improve-crash-diagnostics-when-the-errorboundary-is-hit-by-surfacing-the-underlying-runtime-error-details-in-the-ui-in-a-non-intrusive-way-while-keeping-the-existing-user-facing-message-text-in-english-and-unchanged-in-meaning",
-      "title": "Improve crash diagnostics when the ErrorBoundary is hit by surfacing the underlying runtime error details in the UI in a non-intrusive way while keeping the existing user-facing message text in English and unchanged in meaning.",
-      "reqIds": [
-        "REQ-3"
-      ],
-      "version": 1
     }
   ],
-  "new_feature_requests": [],
-  "projectName": "Fix immediate app-load crash causing ErrorBoundary fallback screen",
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Rename footer option 'for organizations' to 'Subscription plans' and link to a new Subscription Plans page showing: single session ₹200, 4 sessions/month ₹800, 12 sessions/3 months ₹1600; first session entirely free.",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "projectName": "Rename “For Organizations” to “Subscription plans” and add a Subscription Plans page",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

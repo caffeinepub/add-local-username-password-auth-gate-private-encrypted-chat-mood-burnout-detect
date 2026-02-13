@@ -66,17 +66,9 @@ export interface _SERVICE {
     [],
     { 'totalEntries' : bigint, 'totalMessages' : bigint, 'totalUsers' : bigint }
   >,
-  'getTemplatesForCategory' : ActorMethod<
-    [MoodCategory],
-    [] | [
-      {
-        'insightTemplates' : Array<string>,
-        'reassuranceTemplates' : Array<string>,
-      }
-    ]
-  >,
+  'getTemplatesForCategory' : ActorMethod<[MoodCategory], Array<string>>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
-  'initializeMoodCategoryTemplates' : ActorMethod<[], undefined>,
+  'initialize' : ActorMethod<[], undefined>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'listEntries' : ActorMethod<[], Array<DataEntry>>,
   'postEncryptedMessage' : ActorMethod<[Uint8Array], undefined>,

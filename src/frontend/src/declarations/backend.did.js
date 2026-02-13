@@ -83,14 +83,7 @@ export const idlService = IDL.Service({
     ),
   'getTemplatesForCategory' : IDL.Func(
       [MoodCategory],
-      [
-        IDL.Opt(
-          IDL.Record({
-            'insightTemplates' : IDL.Vec(IDL.Text),
-            'reassuranceTemplates' : IDL.Vec(IDL.Text),
-          })
-        ),
-      ],
+      [IDL.Vec(IDL.Text)],
       ['query'],
     ),
   'getUserProfile' : IDL.Func(
@@ -98,7 +91,7 @@ export const idlService = IDL.Service({
       [IDL.Opt(UserProfile)],
       ['query'],
     ),
-  'initializeMoodCategoryTemplates' : IDL.Func([], [], ['oneway']),
+  'initialize' : IDL.Func([], [], ['oneway']),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'listEntries' : IDL.Func([], [IDL.Vec(DataEntry)], []),
   'postEncryptedMessage' : IDL.Func([IDL.Vec(IDL.Nat8)], [], []),
@@ -190,14 +183,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'getTemplatesForCategory' : IDL.Func(
         [MoodCategory],
-        [
-          IDL.Opt(
-            IDL.Record({
-              'insightTemplates' : IDL.Vec(IDL.Text),
-              'reassuranceTemplates' : IDL.Vec(IDL.Text),
-            })
-          ),
-        ],
+        [IDL.Vec(IDL.Text)],
         ['query'],
       ),
     'getUserProfile' : IDL.Func(
@@ -205,7 +191,7 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Opt(UserProfile)],
         ['query'],
       ),
-    'initializeMoodCategoryTemplates' : IDL.Func([], [], ['oneway']),
+    'initialize' : IDL.Func([], [], ['oneway']),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'listEntries' : IDL.Func([], [IDL.Vec(DataEntry)], []),
     'postEncryptedMessage' : IDL.Func([IDL.Vec(IDL.Nat8)], [], []),

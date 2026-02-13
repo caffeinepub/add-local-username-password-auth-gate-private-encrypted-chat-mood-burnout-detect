@@ -64,12 +64,9 @@ export interface backendInterface {
         totalMessages: bigint;
         totalUsers: bigint;
     }>;
-    getTemplatesForCategory(category: MoodCategory): Promise<{
-        insightTemplates: Array<string>;
-        reassuranceTemplates: Array<string>;
-    } | null>;
+    getTemplatesForCategory(category: MoodCategory): Promise<Array<string>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
-    initializeMoodCategoryTemplates(): Promise<void>;
+    initialize(): Promise<void>;
     isCallerAdmin(): Promise<boolean>;
     listEntries(): Promise<Array<DataEntry>>;
     postEncryptedMessage(encryptedText: Uint8Array): Promise<void>;

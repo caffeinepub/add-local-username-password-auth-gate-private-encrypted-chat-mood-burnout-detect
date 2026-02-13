@@ -6,6 +6,7 @@ import ExperienceShell from './ExperienceShell';
 import AnonymousChat from './AnonymousChat';
 import DataEntryPanel from './DataEntryPanel';
 import TherapistInboxPanel from './TherapistInboxPanel';
+import AccessDeniedScreen from '../system/AccessDeniedScreen';
 import ExperienceEntryGate from './ExperienceEntryGate';
 import GoBackButton from '../navigation/GoBackButton';
 import { useLocalAuth } from '@/hooks/useLocalAuth';
@@ -38,8 +39,11 @@ export default function ExperienceView({ onClose }: ExperienceViewProps) {
   };
 
   const handleGoBack = () => {
-    // Use the centralized close handler from parent
-    onClose();
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      onClose();
+    }
   };
 
   // Show entry gate if not authenticated

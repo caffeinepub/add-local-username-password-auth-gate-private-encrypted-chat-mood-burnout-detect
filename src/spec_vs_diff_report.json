@@ -1,42 +1,40 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-13T12:44:43.733Z",
-  "summary": "Diff implements hardening around browser history.state usage in useExperienceNavigationState and adds expandable technical error details to the ErrorBoundary UI, plus additional diagnostic context logging. One potential gap is that the landing page may still show a blocking loading spinner until initialization completes, which could conflict with the requirement that the landing page reliably renders on first load.",
+  "generatedAt": "2026-02-13T15:38:25.414Z",
+  "summary": "REQ-1 appears implemented: the Final CTA secondary button label is changed to “Subscription plans” and wired to navigate to a new Subscription Plans view via client-side state (no full reload). REQ-2 is mostly implemented with a new Subscription Plans page and a free-first-session callout plus a go-back control, but at least one acceptance-criteria string/price is not exact (₹1600 is rendered as “₹1,600”).",
   "missing_requirements": [
     {
-      "id": "REQ-1",
-      "requirement": "Opening the app in a fresh tab renders the landing page instead of the ErrorBoundary fallback; hard-refresh does not crash on initial render; fix prevents runtime exceptions during initial navigation/history state initialization.",
-      "reason": "The navigation/history initialization appears hardened (supporting the intent of REQ-1), but MindVaultLandingPage introduces a blocking loading screen when !isInitialized, which may prevent the landing page from rendering immediately on first load (depending on timing). The diff does not show a change that guarantees the landing content renders regardless of initialization.",
+      "id": "REQ-2",
+      "requirement": "The Subscription Plans page shows three plans with prices exactly: “₹200”, “₹800”, and “₹1600”.",
+      "reason": "The quarterly plan price is shown as “₹1,600” (with a comma), which does not exactly match the required “₹1600”.",
       "evidence": [
-        "frontend/src/pages/MindVaultLandingPage.tsx (returns Loading... when shouldShowLoading is true)",
-        "frontend/src/hooks/useExperienceNavigationState.ts (sets isInitialized true only after effect runs)"
+        "frontend/src/pages/SubscriptionPlansPage.tsx"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Added a blocking loading spinner screen (“Loading...”) on the landing page while navigation state initialization completes.",
-      "reason": "BuildRequest focuses on preventing an initial-load crash and hardening history-state syncing; it does not request adding a new loading UI state, and this could change first-load behavior.",
+      "description": "“Most Popular” highlighting/badge and additional plan feature bullet lists beyond the requested plan/price/time display.",
+      "reason": "The BuildRequest only asks to display three plans with specified prices/descriptions and a free-session note; it does not request popularity labeling or extended feature lists.",
       "evidence": [
-        "frontend/src/pages/MindVaultLandingPage.tsx (shouldShowLoading and Loading... UI)"
+        "frontend/src/pages/SubscriptionPlansPage.tsx"
       ]
     },
     {
-      "description": "Introduced additional navigation-context diagnostics plumbing (setExperienceIntendedOpen + logNavigationContext) beyond the UI requirement for showing error details.",
-      "reason": "REQ-3 asks to surface runtime error details in the UI; adding separate navigation-context logging/flags is not explicitly requested (though it is related diagnostics).",
+      "description": "Browser history integration via pushState/popstate for view switching.",
+      "reason": "Not explicitly requested; navigation without full reload was required, but history state handling is an extra behavior.",
       "evidence": [
-        "frontend/src/components/system/ErrorBoundary.tsx (logNavigationContext import/call)",
-        "frontend/src/pages/MindVaultLandingPage.tsx (setExperienceIntendedOpen import/useEffect)"
+        "frontend/src/pages/MindVaultLandingPage.tsx"
       ]
     }
   ],
-  "confidence": 0.62,
+  "confidence": 0.78,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/src/components/system/ErrorBoundary.tsx",
-    "frontend/src/hooks/useExperienceNavigationState.ts",
+    "frontend/src/components/sections/FinalCTASection.tsx",
     "frontend/src/pages/MindVaultLandingPage.tsx",
+    "frontend/src/pages/SubscriptionPlansPage.tsx",
     "project_state.json"
   ]
 }
