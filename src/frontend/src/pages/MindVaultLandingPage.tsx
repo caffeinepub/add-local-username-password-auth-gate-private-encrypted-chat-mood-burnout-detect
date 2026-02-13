@@ -22,17 +22,9 @@ export default function MindVaultLandingPage() {
     setExperienceIntendedOpen(isExperienceOpen);
   }, [isExperienceOpen]);
 
-  // Don't render until navigation state is initialized to prevent flash
-  if (!isInitialized) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="w-16 h-16 border-4 border-muted border-t-accent rounded-full animate-spin mx-auto" />
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  // Fail-open: render landing content even if initialization is delayed
+  // This prevents blank screens on initial load
+  const shouldShowLoading = !isInitialized;
 
   const landingContent = (
     <div className="min-h-screen bg-background text-foreground">
@@ -85,6 +77,18 @@ export default function MindVaultLandingPage() {
   const experienceContent = (
     <ExperienceView onClose={closeExperience} />
   );
+
+  // Show minimal loading state only if truly not initialized
+  if (shouldShowLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 border-4 border-muted border-t-accent rounded-full animate-spin mx-auto" />
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <ZoomPageTransition

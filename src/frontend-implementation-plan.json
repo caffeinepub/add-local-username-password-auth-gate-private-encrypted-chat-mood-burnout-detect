@@ -1,82 +1,60 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix Start Anonymously intermittent crash by hardening landing↔experience history sync and improving ErrorBoundary diagnostics",
+  "title": "Prevent initial-load crash from unsafe history.state usage and improve ErrorBoundary diagnostics",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Prevent intermittent ErrorBoundary crash when re-opening the Experience view via “Start Anonymously” after navigating through login/chat flows.",
+      "summary": "Eliminate the immediate-on-open runtime crash so the landing page reliably renders on first load and hard refresh.",
       "acceptanceCriteria": [
-        "From the landing page, clicking \"Start Anonymously\" always opens the Experience view without triggering the global ErrorBoundary screen.",
-        "After entering the login flow (Internet Identity choice screen and/or local auth screen) and visiting the Anonymous Chat tab, clicking \"Start Anonymously\" again reliably opens the Experience view.",
-        "QA can repeat the navigation path multiple times (including browser back) without intermittent failures."
+        "Opening the app in a fresh tab (no prior navigation) renders the landing page instead of the ErrorBoundary fallback.",
+        "Hard-refresh (Ctrl/Cmd+Shift+R) does not crash on initial render.",
+        "The fix specifically prevents runtime exceptions during initial navigation/history state initialization."
       ],
       "file_operations": [
         {
           "path": "frontend/src/hooks/useExperienceNavigationState.ts",
-          "operation": "create",
-          "description": "Create a dedicated hook that owns the Experience open/close state machine and keeps it consistent with window.history (pushState/replaceState + popstate), including safe guards for repeated open/close cycles and navigation that occurs while Experience is open."
+          "operation": "modify",
+          "description": "Make initial mount initialization resilient: guard all reads/writes of window.history.state so no exceptions occur during first render, and ensure isInitialized is always set even when history.state is missing or invalid (prevents the landing page from being blocked by a crash)."
         },
         {
           "path": "frontend/src/pages/MindVaultLandingPage.tsx",
           "operation": "modify",
-          "description": "Replace ad-hoc showExperience state/history handling with the new useExperienceNavigationState hook so that \"Start Anonymously\" always results in a valid Experience open state even after visiting login/chat and returning to landing."
-        },
-        {
-          "path": "frontend/src/components/experience/ExperienceView.tsx",
-          "operation": "modify",
-          "description": "Adjust Experience close/back behavior to call the centralized close/back handler from the landing-level navigation state (via prop callback) so leaving the Experience view does not leave behind inconsistent history entries that can later cause a crash."
+          "description": "Add a safe fail-open behavior for first paint: if navigation-state initialization is delayed/unavailable for any reason, ensure the landing content can still render without throwing (keep existing UX otherwise)."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Make landing/experience navigation robust by synchronizing MindVaultLandingPage UI state with browser history.state across open/close, back navigation, and repeated cycles.",
+      "summary": "Harden useExperienceNavigationState history synchronization: never throw on null/non-object history.state and preserve existing state fields when setting mindvault_experience.",
       "acceptanceCriteria": [
-        "Closing the Experience view returns the user to the landing view without leaving history/state in an inconsistent condition.",
-        "Using the browser back button after opening the Experience view returns to the landing view without triggering an error screen.",
-        "Repeated cycles of open Experience -> navigate within Experience (login/chat) -> close/back -> open Experience do not accumulate invalid history states."
+        "When window.history.state is null/undefined, the hook initializes without throwing and writes a valid state via replaceState.",
+        "When window.history.state is an object, the hook keeps existing keys and only adds/updates the mindvault_experience key.",
+        "Open/close cycles of the Experience view still work (openExperience sets state true; closeExperience returns to landing) without crashing.",
+        "Back/forward navigation updates isExperienceOpen correctly without throwing."
       ],
       "file_operations": [
         {
           "path": "frontend/src/hooks/useExperienceNavigationState.ts",
           "operation": "modify",
-          "description": "Implement durable history-state semantics (namespaced state key + initialization via replaceState) and popstate handling that sets UI state from event.state (rather than stale closures), ensuring open/close and back always converge to a consistent landing vs experience view state."
-        },
-        {
-          "path": "frontend/src/pages/MindVaultLandingPage.tsx",
-          "operation": "modify",
-          "description": "Wire open/close actions to the hook so that closing the Experience view either navigates back to the pre-open history entry when appropriate or normalizes state via replaceState, preventing accumulation of invalid/duplicated history states."
-        },
-        {
-          "path": "frontend/src/components/motion/ZoomPageTransition.tsx",
-          "operation": "modify",
-          "description": "Harden transition handling for rapid or repeated showExperience toggles (e.g., ensure timers are cleared and view switching is consistent) so UI transitions cannot desync the visible layer from the underlying navigation state."
+          "description": "Implement safe history state merging: treat non-object history.state (null, undefined, primitives) as an empty object; preserve any existing history.state keys when calling replaceState/pushState; and harden popstate handling so event.state null/non-object cannot cause crashes while still updating isExperienceOpen correctly."
         }
       ]
     },
     {
       "id": "REQ-3",
-      "summary": "Improve ErrorBoundary diagnostics and make “Try Again” recovery deterministic without changing user-facing English meaning.",
+      "summary": "Improve ErrorBoundary fallback diagnostics by allowing users to optionally reveal technical error details without changing the existing user-facing message meaning.",
       "acceptanceCriteria": [
-        "When the ErrorBoundary renders, the console includes the original error plus enough context to debug navigation (at minimum: current URL, history.state, whether Experience was intended to be open).",
-        "Clicking \"Try Again\" results in a deterministic recovery behavior (either successfully re-rendering the app state or performing a full reload), instead of returning to a broken state."
+        "The ErrorBoundary fallback still shows the same headline, body copy, and \"Try Again\" button text.",
+        "The fallback provides an optional way to view technical details (at minimum: error name/message and a short stack excerpt if available).",
+        "Technical details are not shown by default; users must expand/reveal them.",
+        "Error details shown match the actual thrown error captured by the ErrorBoundary state."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/utils/errorBoundaryDiagnostics.ts",
-          "operation": "create",
-          "description": "Add small utilities to safely serialize/print navigation context for debugging (current URL, history.state, and a landing-controlled flag for whether Experience was intended to be open) without throwing during logging."
-        },
-        {
           "path": "frontend/src/components/system/ErrorBoundary.tsx",
           "operation": "modify",
-          "description": "Enhance componentDidCatch logging to include original error + navigation context (URL, history.state, and intended Experience-open flag) using errorBoundaryDiagnostics, and update “Try Again” to a deterministic recovery (prefer full reload or a clearly defined reset+reload fallback) while keeping the on-screen copy in English and unchanged in meaning."
-        },
-        {
-          "path": "frontend/src/pages/MindVaultLandingPage.tsx",
-          "operation": "modify",
-          "description": "Set/update a lightweight, global-friendly 'Experience intended open' signal (via errorBoundaryDiagnostics helper) whenever the landing/experience state changes, so ErrorBoundary logs can reliably indicate whether Experience was supposed to be open at crash time."
+          "description": "Extend the fallback UI to include a collapsed-by-default technical details section (e.g., native details/summary) that shows the captured error name/message and a short stack excerpt when available, while keeping the existing headline/body copy and \"Try Again\" button text unchanged in meaning."
         }
       ]
     }

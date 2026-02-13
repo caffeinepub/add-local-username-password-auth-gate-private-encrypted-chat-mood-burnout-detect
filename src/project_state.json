@@ -4,29 +4,29 @@
   "summary": "New project",
   "architectural_notes": [],
   "known_issues": [
-    "Intermittent error: 'Start Anonymously' page sometimes fails to open after navigating through Login and Chat pages, showing 'something unexpected happened'."
+    "App fails to load immediately on open; shows generic error: \"Something unexpected happened... We encountered an issue loading this page.\""
   ],
   "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-eliminate-the-intermittent-something-unexpected-happened-crash-when-the-user-clicks-start-anonymously-after-navigating-through-the-login-flow-and-the-anonymous-chat-experience-ensuring-the-experience-view-always-opens-reliably",
-      "title": "Eliminate the intermittent \"Something unexpected happened\" crash when the user clicks \"Start Anonymously\" after navigating through the login flow and the anonymous chat experience, ensuring the Experience view always opens reliably.",
+      "id": "feature-fix-the-app-s-immediate-on-open-crash-that-triggers-the-errorboundary-fallback-screen-something-unexpected-happened-so-the-landing-page-reliably-renders-on-first-load",
+      "title": "Fix the app’s immediate-on-open crash that triggers the ErrorBoundary fallback screen (\"Something unexpected happened\") so the landing page reliably renders on first load.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-make-landing-experience-navigation-state-robust-by-keeping-the-ui-state-in-mindvaultlandingpage-in-sync-with-browser-history-state-during-open-close-and-back-navigation-including-repeated-open-close-cycles",
-      "title": "Make landing/experience navigation state robust by keeping the UI state in MindVaultLandingPage in sync with browser history state during open/close and back navigation (including repeated open/close cycles).",
+      "id": "feature-harden-browser-history-state-synchronization-in-useexperiencenavigationstate-so-it-never-throws-when-window-history-state-is-null-or-a-non-object-and-it-preserves-any-existing-history-state-fields-when-adding-the-mindvault-experience-flag",
+      "title": "Harden browser history state synchronization in useExperienceNavigationState so it never throws when window.history.state is null or a non-object, and it preserves any existing history.state fields when adding the mindvault_experience flag.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-improve-diagnostics-for-this-crash-by-capturing-and-surfacing-the-underlying-runtime-error-details-when-the-errorboundary-is-hit-while-keeping-user-facing-copy-in-english-and-unchanged-in-meaning",
-      "title": "Improve diagnostics for this crash by capturing and surfacing the underlying runtime error details when the ErrorBoundary is hit (while keeping user-facing copy in English and unchanged in meaning).",
+      "id": "feature-improve-crash-diagnostics-when-the-errorboundary-is-hit-by-surfacing-the-underlying-runtime-error-details-in-the-ui-in-a-non-intrusive-way-while-keeping-the-existing-user-facing-message-text-in-english-and-unchanged-in-meaning",
+      "title": "Improve crash diagnostics when the ErrorBoundary is hit by surfacing the underlying runtime error details in the UI in a non-intrusive way while keeping the existing user-facing message text in English and unchanged in meaning.",
       "reqIds": [
         "REQ-3"
       ],
@@ -34,7 +34,7 @@
     }
   ],
   "new_feature_requests": [],
-  "projectName": "Fix intermittent crash when opening 'Start Anonymously' after navigating through Login/Chat",
+  "projectName": "Fix immediate app-load crash causing ErrorBoundary fallback screen",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

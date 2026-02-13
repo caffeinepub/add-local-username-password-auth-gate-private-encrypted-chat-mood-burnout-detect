@@ -2,10 +2,9 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-eliminate-the-intermittent-something-unexpected-happened-crash-when-the-user-clicks-start-anonymously-after-navigating-through-the-login-flow-and-the-anonymous-chat-experience-ensuring-the-experience-view-always-opens-reliably",
-      "featureTitle": "Eliminate the intermittent \"Something unexpected happened\" crash when the user clicks \"Start Anonymously\" after navigating through the login flow and the anonymous chat experience, ensuring the Experience view always opens reliably.",
+      "featureId": "feature-fix-the-app-s-immediate-on-open-crash-that-triggers-the-errorboundary-fallback-screen-something-unexpected-happened-so-the-landing-page-reliably-renders-on-first-load",
+      "featureTitle": "Fix the app’s immediate-on-open crash that triggers the ErrorBoundary fallback screen (\"Something unexpected happened\") so the landing page reliably renders on first load.",
       "files": [
-        "frontend/src/components/experience/ExperienceView.tsx",
         "frontend/src/hooks/useExperienceNavigationState.ts",
         "frontend/src/pages/MindVaultLandingPage.tsx"
       ],
@@ -23,12 +22,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-make-landing-experience-navigation-state-robust-by-keeping-the-ui-state-in-mindvaultlandingpage-in-sync-with-browser-history-state-during-open-close-and-back-navigation-including-repeated-open-close-cycles",
-      "featureTitle": "Make landing/experience navigation state robust by keeping the UI state in MindVaultLandingPage in sync with browser history state during open/close and back navigation (including repeated open/close cycles).",
+      "featureId": "feature-harden-browser-history-state-synchronization-in-useexperiencenavigationstate-so-it-never-throws-when-window-history-state-is-null-or-a-non-object-and-it-preserves-any-existing-history-state-fields-when-adding-the-mindvault-experience-flag",
+      "featureTitle": "Harden browser history state synchronization in useExperienceNavigationState so it never throws when window.history.state is null or a non-object, and it preserves any existing history.state fields when adding the mindvault_experience flag.",
       "files": [
-        "frontend/src/components/motion/ZoomPageTransition.tsx",
-        "frontend/src/hooks/useExperienceNavigationState.ts",
-        "frontend/src/pages/MindVaultLandingPage.tsx"
+        "frontend/src/hooks/useExperienceNavigationState.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -44,12 +41,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-improve-diagnostics-for-this-crash-by-capturing-and-surfacing-the-underlying-runtime-error-details-when-the-errorboundary-is-hit-while-keeping-user-facing-copy-in-english-and-unchanged-in-meaning",
-      "featureTitle": "Improve diagnostics for this crash by capturing and surfacing the underlying runtime error details when the ErrorBoundary is hit (while keeping user-facing copy in English and unchanged in meaning).",
+      "featureId": "feature-improve-crash-diagnostics-when-the-errorboundary-is-hit-by-surfacing-the-underlying-runtime-error-details-in-the-ui-in-a-non-intrusive-way-while-keeping-the-existing-user-facing-message-text-in-english-and-unchanged-in-meaning",
+      "featureTitle": "Improve crash diagnostics when the ErrorBoundary is hit by surfacing the underlying runtime error details in the UI in a non-intrusive way while keeping the existing user-facing message text in English and unchanged in meaning.",
       "files": [
-        "frontend/src/components/system/ErrorBoundary.tsx",
-        "frontend/src/pages/MindVaultLandingPage.tsx",
-        "frontend/src/utils/errorBoundaryDiagnostics.ts"
+        "frontend/src/components/system/ErrorBoundary.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",

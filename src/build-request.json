@@ -1,73 +1,78 @@
 {
   "kind": "build_request",
-  "title": "Fix intermittent crash when opening 'Start Anonymously' after navigating through Login/Chat",
-  "priority": "normal",
+  "title": "Fix immediate app-load crash causing ErrorBoundary fallback screen",
+  "priority": "high",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Eliminate the intermittent \"Something unexpected happened\" crash when the user clicks \"Start Anonymously\" after navigating through the login flow and the anonymous chat experience, ensuring the Experience view always opens reliably.",
+      "text": "Fix the app’s immediate-on-open crash that triggers the ErrorBoundary fallback screen (\"Something unexpected happened\") so the landing page reliably renders on first load.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "recent-1"
         ],
         "quotes": [
-          "now the start anonymously page wont open, shows something unexpected happened",
-          "most recent, starting page after i try to go into the login page and through the chat page",
-          "only sometimes"
+          "theres an issue in loading the page , fix it",
+          "everything, error message, happening before",
+          "immediately after opening the app4",
+          "start now"
         ]
       },
       "acceptanceCriteria": [
-        "From the landing page, clicking \"Start Anonymously\" always opens the Experience view without triggering the global ErrorBoundary screen.",
-        "After entering the login flow (Internet Identity choice screen and/or local auth screen) and visiting the Anonymous Chat tab, clicking \"Start Anonymously\" again reliably opens the Experience view.",
-        "QA can repeat the navigation path multiple times (including browser back) without intermittent failures."
+        "Opening the app in a fresh tab (no prior navigation) renders the landing page instead of the ErrorBoundary fallback.",
+        "Hard-refresh (Ctrl/Cmd+Shift+R) does not crash on initial render.",
+        "The fix specifically prevents runtime exceptions during initial navigation/history state initialization."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Make landing/experience navigation state robust by keeping the UI state in MindVaultLandingPage in sync with browser history state during open/close and back navigation (including repeated open/close cycles).",
+      "text": "Harden browser history state synchronization in useExperienceNavigationState so it never throws when window.history.state is null or a non-object, and it preserves any existing history.state fields when adding the mindvault_experience flag.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "recent-1"
         ],
         "quotes": [
-          "only sometimes"
+          "App fails to load immediately on open; shows generic error: \"Something unexpected happened... We encountered an issue loading this page.\""
         ]
       },
       "acceptanceCriteria": [
-        "Closing the Experience view returns the user to the landing view without leaving history/state in an inconsistent condition.",
-        "Using the browser back button after opening the Experience view returns to the landing view without triggering an error screen.",
-        "Repeated cycles of open Experience -> navigate within Experience (login/chat) -> close/back -> open Experience do not accumulate invalid history states."
+        "When window.history.state is null/undefined, the hook initializes without throwing and writes a valid state via replaceState.",
+        "When window.history.state is an object, the hook keeps existing keys and only adds/updates the mindvault_experience key.",
+        "Open/close cycles of the Experience view still work (openExperience sets state true; closeExperience returns to landing) without crashing.",
+        "Back/forward navigation updates isExperienceOpen correctly without throwing."
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Improve diagnostics for this crash by capturing and surfacing the underlying runtime error details when the ErrorBoundary is hit (while keeping user-facing copy in English and unchanged in meaning).",
+      "text": "Improve crash diagnostics when the ErrorBoundary is hit by surfacing the underlying runtime error details in the UI in a non-intrusive way while keeping the existing user-facing message text in English and unchanged in meaning.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "recent-1"
         ],
         "quotes": [
-          "shows something unexpected happened"
+          "Something unexpected happened",
+          "We encountered an issue loading this page. This isn't your fault—please try again."
         ]
       },
       "acceptanceCriteria": [
-        "When the ErrorBoundary renders, the console includes the original error plus enough context to debug navigation (at minimum: current URL, history.state, whether Experience was intended to be open).",
-        "Clicking \"Try Again\" results in a deterministic recovery behavior (either successfully re-rendering the app state or performing a full reload), instead of returning to a broken state."
+        "The ErrorBoundary fallback still shows the same headline, body copy, and \"Try Again\" button text.",
+        "The fallback provides an optional way to view technical details (at minimum: error name/message and a short stack excerpt if available).",
+        "Technical details are not shown by default; users must expand/reveal them.",
+        "Error details shown match the actual thrown error captured by the ErrorBoundary state."
       ]
     }
   ],
   "constraints": [
-    "Do not edit files under frontend/src/components/ui (read-only shadcn components).",
-    "Do not edit immutable hook entrypoints listed by SYSTEM_CONTEXT (compose around them instead).",
-    "Keep all backend logic in the single Motoko actor (no new backend services)."
+    "Do not edit files in frontend immutablePaths (frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui).",
+    "Keep all user-facing text in English.",
+    "Backend remains single-actor Motoko; do not introduce additional backend services."
   ],
   "nonGoals": [
-    "Do not add new authentication providers beyond Internet Identity and existing local auth.",
-    "Do not redesign the marketing/landing page content beyond what is necessary to fix navigation reliability.",
-    "Do not change mood template/preset functionality as part of this fix unless it is directly implicated in the crash."
+    "Adding new product features beyond fixing the load crash and improving related diagnostics.",
+    "Changing authentication flows (Internet Identity or Local Auth) unless required to resolve the crash.",
+    "Redesigning the landing page or Experience UI visuals beyond what is needed to fix the error state and diagnostics."
   ],
   "imageRequirements": {
     "required": [],

@@ -1,6 +1,6 @@
 {
   "frontend/src/App.tsx": "Root application component with ErrorBoundary, Suspense, LocalAuthProvider, and Sonner Toaster mounted at app root for consistent toast notifications with pop-up styling.",
-  "frontend/src/pages/MindVaultLandingPage.tsx": "Main landing page using useExperienceNavigationState hook for robust history-synchronized navigation between landing and experience views with diagnostic flag updates.",
+  "frontend/src/pages/MindVaultLandingPage.tsx": "Main landing page using useExperienceNavigationState hook with fail-open behavior that renders landing content even if initialization is delayed to prevent blank screens on first load.",
   "frontend/src/components/sections/HeroSection.tsx": "Hero section with light-theme gradient background using OKLCH token values (98-97% lightness range), reduced orb opacity (10%) for subtle visual interest, and preserved reduced-motion behavior.",
   "frontend/src/components/sections/CoreEmotionalQuestionSection.tsx": "Emotional question section displaying the core value proposition with scroll-triggered fade-in animation.",
   "frontend/src/components/sections/HowItWorksSection.tsx": "Three-step flow section with icons, descriptions, progress indicator, staggered reveals, and interactive hover/focus conversation preview; fixed by replacing curly quotes with standard ASCII quotes.",
@@ -17,7 +17,7 @@
   "frontend/src/components/primitives/ProgressIndicator.tsx": "Progress indicator showing current step in multi-step flows with accessible ARIA attributes and reduced-motion support.",
   "frontend/src/components/primitives/ConversationPreview.tsx": "Conversation preview panel displaying example AI/user exchanges with message bubbles and smooth animations.",
   "frontend/src/components/visual/NeuralParticlesOverlay.tsx": "Performant canvas-based particle system creating subtle neural network aesthetic with connection lines, respecting reduced-motion preferences; fixed TypeScript error by providing initial value for useRef.",
-  "frontend/src/components/system/ErrorBoundary.tsx": "Production-grade React Error Boundary with enhanced navigation context logging and deterministic full-page reload recovery on \"Try Again\" click.",
+  "frontend/src/components/system/ErrorBoundary.tsx": "Production-grade React Error Boundary with enhanced navigation context logging, deterministic full-page reload recovery, and collapsible technical details section showing error name, message, and stack excerpt.",
   "frontend/src/lib/useInView.ts": "Custom hook using IntersectionObserver for scroll-triggered animations with automatic reduced-motion support.",
   "frontend/src/lib/usePrefersReducedMotion.ts": "Custom hook detecting user's prefers-reduced-motion preference via media query for accessibility compliance.",
   "frontend/src/lib/motion.ts": "Centralized motion constants including zoom-specific durations, easing curves, transition helpers, and configuration objects for consistent page-level and component-level zoom animations across the app.",
@@ -51,6 +51,6 @@
   "frontend/src/components/system/AccessDeniedScreen.tsx": "Access denied UI component with shield icon and message for unauthorized users attempting to access restricted areas.",
   "frontend/src/components/experience/TherapistInboxPanel.tsx": "Admin-only panel displaying all session requests with category badges, timestamps, user principals, and request messages in a scrollable list.",
   "frontend/src/components/experience/MoodPresetTemplatesCallout.tsx": "New dedicated callout component for displaying mood preset guidance with visually separated \"Reassurance\" and \"Insight\" sections, category-specific styling, and popup-surface gradient background.",
-  "frontend/src/hooks/useExperienceNavigationState.ts": "Centralized hook managing Experience view open/close state synchronized with browser history using pushState/replaceState and popstate events to prevent intermittent navigation crashes.",
+  "frontend/src/hooks/useExperienceNavigationState.ts": "Centralized hook managing Experience view open/close state synchronized with browser history, hardened to safely handle null/undefined/non-object history.state on initial mount and navigation with comprehensive try-catch guards and state merging.",
   "frontend/src/utils/errorBoundaryDiagnostics.ts": "Utilities for capturing and logging navigation context (URL, history state, experience open flag) during ErrorBoundary crashes to aid debugging."
 }
