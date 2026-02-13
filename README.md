@@ -1,2 +1,3 @@
-# add-local-username-password-auth-gate-private-encrypted-chat-mood-burnout-detect
-Exported from Caffeine project: Add local username/password auth gate, private encrypted chat, mood/burnout detection, and therapist prompt flow
+## 
+
+To run app build and run docker image: `docker build -t app . docker run -it --network host app`

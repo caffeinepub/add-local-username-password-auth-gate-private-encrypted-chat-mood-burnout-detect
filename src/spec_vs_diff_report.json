@@ -1,0 +1,85 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-13T07:33:47.314Z",
+  "summary": "Diff adds a frontend-only local username/password flow with IndexedDB storage, local CAPTCHA, password complexity policy utilities, client-side AES-GCM message encryption/decryption helpers, a rule-based mood/burnout classifier, and a therapist prompt modal integrated into the chat flow. However, the backend changes gate APIs using an existing AccessControl/Internet Identity-style permission check rather than the requested local username/password accounts/sessions, and no backend auth/account/session canister methods or stable upgrade persistence for those are evidenced.",
+  "missing_requirements": [
+    {
+      "id": "REQ-23",
+      "requirement": "Backend supports local user accounts and sessions (sign-up/sign-in/sign-out/auth status), gates chat/data-entry write APIs based on local authentication, and persists state across upgrades using stable storage (migration.mo if needed).",
+      "reason": "backend/main.mo only shows gating via AccessControl.hasPermission for caller Principal and does not show any canister methods for local username/password sign-up/sign-in/sign-out/auth status, nor any stable variables/persistence/migration for local auth state. The gating appears tied to existing permissions/identity, not the new local auth system.",
+      "evidence": [
+        "backend/main.mo"
+      ]
+    },
+    {
+      "id": "REQ-21",
+      "requirement": "Robust transmission and backend-side secure credential handling: passwords never stored/returned in plaintext by backend; only non-sensitive metadata returned; password complexity + rotation enforced.",
+      "reason": "Local auth appears implemented entirely client-side (IndexedDB account store + PBKDF2-derived verifier). The diff does not show any backend credential storage/verification, and therefore does not demonstrate backend guarantees about not storing/returning plaintext passwords, nor robust credential transmission policies. Rotation enforcement is referenced in UI/policy utilities, but backend enforcement is not evidenced.",
+      "evidence": [
+        "frontend/src/auth/localAuthStore.ts",
+        "frontend/src/auth/localAuthCrypto.ts",
+        "frontend/src/hooks/useLocalAuth.tsx",
+        "backend/main.mo"
+      ]
+    },
+    {
+      "id": "REQ-20",
+      "requirement": "Local username/password auth gate must be completed before accessing Anonymous Chat experience; CTA routes to sign-in/sign-up unless authenticated; logout returns to pre-login state preventing access.",
+      "reason": "ExperienceView now conditionally shows LocalAuthScreen when not authenticated, and provides a Logout button. However, the diff summary does not include the CTA routing change itself (the landing CTA that currently opens the experience should route into the auth flow first). Without the full landing/CTA diff, this is not conclusively implemented from provided evidence.",
+      "evidence": [
+        "frontend/src/components/experience/ExperienceView.tsx",
+        "frontend-file-summaries.txt (mentions CTA wiring but not auth gating behavior)"
+      ]
+    },
+    {
+      "id": "REQ-24",
+      "requirement": "Backend stores and returns encrypted payloads (ciphertext) rather than plaintext; E2EE-like flow maintained; client shows placeholder if cannot decrypt; polling behavior not broken.",
+      "reason": "Frontend encrypts outgoing messages and attempts to decrypt on display with a placeholder when decryption fails. But backend/main.mo still defines Message.text : Text and stores whatever the client sends; there is no evidence the backend enforces/ensures ciphertext-only storage/return, nor any storage-format validation. Also, the encryption key management shown in useLocalAuth has a questionable session key derivation (deriving from username+username) which may prevent consistent decryption across sessions, but the core missing point is lack of backend-side encrypted-payload handling requirement evidence.",
+      "evidence": [
+        "frontend/src/lib/crypto/e2ee.ts",
+        "frontend/src/components/experience/AnonymousChat.tsx",
+        "backend/main.mo",
+        "frontend/src/hooks/useLocalAuth.tsx"
+      ]
+    }
+  ],
+  "hallucinated_features": [
+    {
+      "description": "Backend AccessControl/permission gating tied to caller Principal (likely Internet Identity) rather than the requested custom local username/password session system.",
+      "reason": "BuildRequest explicitly requires a custom local username/password system and says not to rely on Internet Identity for the requested local auth; the diff modifies backend to use AccessControl.hasPermission(#user) checks without adding local account/session methods.",
+      "evidence": [
+        "backend/main.mo",
+        "frontend/src/hooks/useActor.ts"
+      ]
+    },
+    {
+      "description": "URL/sessionStorage parameter utilities and admin secret token initialization flow (caffeineAdminToken) used to initialize backend access control.",
+      "reason": "Not requested by any requirement; appears unrelated to local auth gate, encryption, classifier, or therapist prompt flow.",
+      "evidence": [
+        "frontend/src/utils/urlParams.ts",
+        "frontend/src/hooks/useActor.ts",
+        "backend/main.mo (references AccessControl/MixinAuthorization)"
+      ]
+    }
+  ],
+  "confidence": 0.74,
+  "changed_files": [
+    "backend/main.mo",
+    "frontend-file-summaries.txt",
+    "frontend/src/auth/localAuthCrypto.ts",
+    "frontend/src/auth/localAuthStore.ts",
+    "frontend/src/components/auth/LocalAuthScreen.tsx",
+    "frontend/src/components/auth/LocalCaptcha.tsx",
+    "frontend/src/components/experience/AnonymousChat.tsx",
+    "frontend/src/components/experience/ExperienceView.tsx",
+    "frontend/src/components/experience/TherapistPromptModal.tsx",
+    "frontend/src/hooks/useActor.ts",
+    "frontend/src/hooks/useLocalAuth.tsx",
+    "frontend/src/lib/classifier/moodBurnoutRules.ts",
+    "frontend/src/lib/crypto/e2ee.ts",
+    "frontend/src/lib/security/passwordPolicy.ts",
+    "frontend/src/utils/urlParams.ts",
+    "project_state.json"
+  ]
+}

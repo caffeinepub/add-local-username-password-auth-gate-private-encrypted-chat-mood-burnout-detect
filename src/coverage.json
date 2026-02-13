@@ -1,0 +1,146 @@
+{
+  "kind": "coverage_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-13T07:33:47.317Z",
+  "sources": {
+    "buildRequest": true,
+    "implementationPlan": true
+  },
+  "requirements": {
+    "total": 7,
+    "implemented": 6,
+    "items": [
+      {
+        "id": "REQ-20",
+        "summary": "Add a custom local username/password authentication system that must be completed before a user can access the Anonymous Chat experience.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useLocalAuth.tsx",
+          "frontend/src/auth/localAuthStore.ts",
+          "frontend/src/components/auth/LocalAuthScreen.tsx",
+          "frontend/src/components/experience/ExperienceView.tsx",
+          "frontend/src/pages/MindVaultLandingPage.tsx",
+          "frontend/src/main.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/hooks/useLocalAuth.tsx",
+          "frontend/src/auth/localAuthStore.ts",
+          "frontend/src/components/auth/LocalAuthScreen.tsx",
+          "frontend/src/components/experience/ExperienceView.tsx"
+        ]
+      },
+      {
+        "id": "REQ-21",
+        "summary": "Implement secure credential handling for local auth: secure storage, robust transmission, strict user policies including password complexity AND password rotation enforced simultaneously.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/lib/security/passwordPolicy.ts",
+          "frontend/src/auth/localAuthCrypto.ts",
+          "frontend/src/components/auth/LocalAuthScreen.tsx",
+          "frontend/src/hooks/useLocalAuth.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/lib/security/passwordPolicy.ts",
+          "frontend/src/auth/localAuthCrypto.ts",
+          "frontend/src/components/auth/LocalAuthScreen.tsx",
+          "frontend/src/hooks/useLocalAuth.tsx"
+        ]
+      },
+      {
+        "id": "REQ-22",
+        "summary": "Add a simple local CAPTCHA-style challenge as an additional authentication layer during account creation and/or sign-in, implemented without third-party services.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/auth/LocalCaptcha.tsx",
+          "frontend/src/components/auth/LocalAuthScreen.tsx",
+          "frontend/src/hooks/useLocalAuth.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/auth/LocalCaptcha.tsx",
+          "frontend/src/components/auth/LocalAuthScreen.tsx",
+          "frontend/src/hooks/useLocalAuth.tsx"
+        ]
+      },
+      {
+        "id": "REQ-23",
+        "summary": "Extend the Motoko backend to support local user accounts and sessions suitable for gating access to chat/data-entry APIs, while keeping to the single-actor architecture.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-24",
+        "summary": "Implement a simplified private encryption layer for anonymous chat such that messages are end-to-end encrypted between clients and also encrypted for storage/transport on the platform (store ciphertext, not plaintext).",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/lib/crypto/e2ee.ts",
+          "frontend/src/hooks/useLocalAuth.tsx",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/experience/AnonymousChat.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/lib/crypto/e2ee.ts",
+          "frontend/src/hooks/useLocalAuth.tsx",
+          "frontend/src/components/experience/AnonymousChat.tsx"
+        ]
+      },
+      {
+        "id": "REQ-25",
+        "summary": "Add an IC-hosted/on-device rule-based classifier that analyzes submitted chat text to identify mood and mental burnout signals, and generate a deterministic, rule-based supportive response.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/lib/classifier/moodBurnoutRules.ts",
+          "frontend/src/components/experience/AnonymousChat.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/lib/classifier/moodBurnoutRules.ts",
+          "frontend/src/components/experience/AnonymousChat.tsx"
+        ]
+      },
+      {
+        "id": "REQ-26",
+        "summary": "After the system produces the supportive response to the submitted chat text, present a dedicated screen (or modal step) that offers to connect the user to a licensed therapist and states that the first session will be free if the user proceeds.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/experience/TherapistPromptModal.tsx",
+          "frontend/src/components/experience/AnonymousChat.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/experience/TherapistPromptModal.tsx",
+          "frontend/src/components/experience/AnonymousChat.tsx"
+        ]
+      }
+    ]
+  },
+  "changedFiles": [
+    "backend/authorization/MixinAuthorization.mo",
+    "backend/authorization/access-control.mo",
+    "backend/main.mo",
+    "build-request.json",
+    "caffeine.lock.json",
+    "feature_evidence.json",
+    "frontend-file-summaries.txt",
+    "frontend-implementation-plan.json",
+    "frontend/src/auth/localAuthCrypto.ts",
+    "frontend/src/auth/localAuthStore.ts",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/auth/LocalAuthScreen.tsx",
+    "frontend/src/components/auth/LocalCaptcha.tsx",
+    "frontend/src/components/experience/AnonymousChat.tsx",
+    "frontend/src/components/experience/ExperienceView.tsx",
+    "frontend/src/components/experience/TherapistPromptModal.tsx",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useActor.ts",
+    "frontend/src/hooks/useLocalAuth.tsx",
+    "frontend/src/lib/classifier/moodBurnoutRules.ts",
+    "frontend/src/lib/crypto/e2ee.ts",
+    "frontend/src/lib/security/passwordPolicy.ts",
+    "frontend/src/utils/urlParams.ts",
+    "project_state.json",
+    "scratch/component-selection.json",
+    "spec.md",
+    "spec_vs_diff_report.json"
+  ]
+}

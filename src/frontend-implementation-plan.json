@@ -1,0 +1,180 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Local auth gate, encrypted private chat, rule-based mood/burnout responses, and therapist prompt flow (frontend-only)",
+  "requirements": [
+    {
+      "id": "REQ-20",
+      "summary": "Gate the Anonymous Chat experience behind a custom local username/password sign-in/sign-up flow, with logout returning to the pre-login state.",
+      "acceptanceCriteria": [
+        "When the user clicks the existing CTA that currently opens the experience, they are routed to a local sign-in/sign-up flow instead of the chat UI unless already authenticated",
+        "After successful local login, the user can access the experience view (chat + data entry) without errors",
+        "Logout is available and returns the user to the pre-login state, preventing access to chat until login again"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useLocalAuth.tsx",
+          "operation": "create",
+          "description": "Create a LocalAuthProvider + useLocalAuth hook that manages local auth state (authenticated/unauthenticated), exposes signUp/signIn/signOut, and integrates with React Query cache clearing on logout. Store only non-sensitive session markers; never store plaintext passwords."
+        },
+        {
+          "path": "frontend/src/auth/localAuthStore.ts",
+          "operation": "create",
+          "description": "Implement local account persistence (username + salted password verifier + password change timestamp + policy metadata) using a browser storage mechanism suitable for app data (e.g., IndexedDB). Ensure no plaintext passwords are persisted and no secrets are written to URLs."
+        },
+        {
+          "path": "frontend/src/components/auth/LocalAuthScreen.tsx",
+          "operation": "create",
+          "description": "Create a dedicated sign-in/sign-up UI for the local auth gate, including clear navigation between modes and inline validation. Use existing shadcn UI components (e.g., Button/Input/Label) for form controls; verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/experience/ExperienceView.tsx",
+          "operation": "modify",
+          "description": "Wrap the existing ExperienceView content with the local auth gate: if not authenticated, render LocalAuthScreen; if authenticated, render the chat + data entry grid. Add a Logout control in the header that calls signOut and returns the view to the pre-login/auth screen without losing the landing page wiring. Use existing shadcn UI Button; verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/MindVaultLandingPage.tsx",
+          "operation": "modify",
+          "description": "Keep the existing CTA wiring but ensure the experience open action lands on the gated ExperienceView (auth screen first when not authenticated). Confirm that the 'Start Anonymously' and final CTA actions still open the experience container and that closing returns to the landing page."
+        },
+        {
+          "path": "frontend/src/main.tsx",
+          "operation": "modify",
+          "description": "Register LocalAuthProvider near the app root (alongside existing providers) so auth state is available to ExperienceView, chat, and data entry flows."
+        }
+      ]
+    },
+    {
+      "id": "REQ-21",
+      "summary": "Enforce strict password policy (complexity + rotation) and secure frontend credential handling for the local auth flow.",
+      "acceptanceCriteria": [
+        "Signup rejects passwords that do not meet a strict complexity policy (define and display requirements in the UI)",
+        "Login/signup flows enforce a password rotation policy (define and display the rotation window and required behavior)",
+        "Passwords are never stored or returned in plaintext by the backend; only non-sensitive account metadata may be returned",
+        "Frontend does not log passwords or include them in query keys / URLs / local storage"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/lib/security/passwordPolicy.ts",
+          "operation": "create",
+          "description": "Define deterministic password complexity and rotation rules (e.g., minimum length, character classes, disallow common patterns, rotation window). Export helpers to validate and to produce user-facing English requirement text."
+        },
+        {
+          "path": "frontend/src/auth/localAuthCrypto.ts",
+          "operation": "create",
+          "description": "Implement WebCrypto-based password handling for local auth (salt generation, key derivation, password verifier computation) so only salted verifiers and policy metadata are stored. Ensure sensitive values are kept in-memory only and never logged."
+        },
+        {
+          "path": "frontend/src/components/auth/LocalAuthScreen.tsx",
+          "operation": "modify",
+          "description": "Display password complexity requirements and rotation window in English. Enforce complexity at sign-up and enforce rotation behavior at sign-in (e.g., require update when expired) with clear, non-revealing error states. Ensure form submission does not put credentials into query keys, URLs, or local storage."
+        },
+        {
+          "path": "frontend/src/hooks/useLocalAuth.tsx",
+          "operation": "modify",
+          "description": "Apply policy enforcement in signUp/signIn flows (complexity + rotation simultaneously). Ensure signOut clears any in-memory derived key material and clears React Query caches related to chat/entries."
+        }
+      ]
+    },
+    {
+      "id": "REQ-22",
+      "summary": "Add a local CAPTCHA-style challenge to the auth screens with regeneration and safe error messaging.",
+      "acceptanceCriteria": [
+        "Auth screens include a local challenge step that must be passed before submitting credentials",
+        "The challenge regenerates on demand and after repeated failed attempts",
+        "User-facing errors are shown in English and do not expose internal details"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/auth/LocalCaptcha.tsx",
+          "operation": "create",
+          "description": "Create a simple local CAPTCHA-style challenge component (no third-party services) with regenerate control and deterministic validation. Use existing shadcn UI components for inputs/buttons; verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/auth/LocalAuthScreen.tsx",
+          "operation": "modify",
+          "description": "Integrate LocalCaptcha as a required step before enabling credential submission for sign-in and/or sign-up. Regenerate the challenge on demand and automatically after repeated failed attempts; show English-only, non-internal error messages."
+        },
+        {
+          "path": "frontend/src/hooks/useLocalAuth.tsx",
+          "operation": "modify",
+          "description": "Track failed auth attempts in-memory for the current session to trigger CAPTCHA regeneration thresholds without persisting sensitive failure telemetry."
+        }
+      ]
+    },
+    {
+      "id": "REQ-24",
+      "summary": "Encrypt outgoing chat messages client-side and decrypt on display using a simplified, app-contained E2EE-style approach while preserving polling behavior.",
+      "acceptanceCriteria": [
+        "Frontend encrypts outgoing chat messages before sending them to the backend; backend stores and returns encrypted payloads rather than plaintext",
+        "Frontend decrypts messages for display when it has the required key material; if it cannot decrypt, it shows a clear English placeholder state (without leaking ciphertext as normal text)",
+        "No third-party encryption services/protocol implementations are introduced; the solution remains a simplified, app-contained approach",
+        "The encryption feature does not break the existing polling/refresh behavior of the chat UI (React Query refetch interval)"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/lib/crypto/e2ee.ts",
+          "operation": "create",
+          "description": "Implement a simplified, app-contained encryption helper using WebCrypto (e.g., derive a symmetric key from the locally authenticated session secret, encrypt with random IV, encode as structured ciphertext). Include safe parsing and decryption helpers that fail closed and return a non-sensitive error state."
+        },
+        {
+          "path": "frontend/src/hooks/useLocalAuth.tsx",
+          "operation": "modify",
+          "description": "Derive and hold required key material in memory after successful local login for use by encryption/decryption helpers. Ensure key material is cleared on logout and not persisted."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Update chat mutation/query wrappers so that posting uses ciphertext (via the e2ee helper) and reading attempts decryption before returning display-ready data. Preserve the existing React Query refetch interval behavior."
+        },
+        {
+          "path": "frontend/src/components/experience/AnonymousChat.tsx",
+          "operation": "modify",
+          "description": "Encrypt outgoing messages before submit and render decrypted text for messages when possible. If decryption fails or key material is unavailable, show a clear English placeholder (do not render ciphertext as if it were normal chat text). Keep existing scrolling and polling UX intact. Use existing shadcn UI components; verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-25",
+      "summary": "Add a deterministic, rule-based mood/burnout classifier that generates a supportive English response and show it in the chat flow as a system message.",
+      "acceptanceCriteria": [
+        "When a user submits a chat message, the app produces a rule-based analysis result (e.g., mood label and burnout risk level) and a supportive response text in English",
+        "The classifier is rule-based (no external AI API calls) and runs within platform constraints",
+        "The user can see the generated supportive response as part of the chat flow (clearly identified as a system/assistant response)"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/lib/classifier/moodBurnoutRules.ts",
+          "operation": "create",
+          "description": "Implement an on-device deterministic ruleset to classify mood and burnout signals from user text and generate a supportive response in English. Do not call any external AI/LLM services."
+        },
+        {
+          "path": "frontend/src/components/experience/AnonymousChat.tsx",
+          "operation": "modify",
+          "description": "After a user submits a message, run the rule-based classifier locally and inject a clearly labeled system/assistant response into the chat UI flow (without requiring any external services). Ensure the supportive response is visually distinct from user messages."
+        }
+      ]
+    },
+    {
+      "id": "REQ-26",
+      "summary": "After showing the supportive response, prompt the user with an in-app therapist connection offer (first session free) with proceed/decline while preserving conversation state.",
+      "acceptanceCriteria": [
+        "After the supportive response is shown, the user is prompted with a clear English UI offering to proceed to therapist connection and stating the first session is free",
+        "The user can choose to proceed or decline and return to the chat experience without losing the current conversation state",
+        "No external therapist scheduling/payment integrations are added; the screen is an in-app prompt/flow only"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/experience/TherapistPromptModal.tsx",
+          "operation": "create",
+          "description": "Create a dedicated modal (or step panel) that states the offer to connect to a licensed therapist and that the first session will be free, with Proceed/Decline actions. Use existing shadcn UI dialog primitives if available in the project; verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/experience/AnonymousChat.tsx",
+          "operation": "modify",
+          "description": "Trigger the therapist prompt immediately after the supportive response is produced and displayed. Ensure Decline cleanly closes the prompt and returns to the chat without clearing messages or input state, and Proceed advances to an in-app confirmation state (no external integrations)."
+        }
+      ]
+    }
+  ]
+}
