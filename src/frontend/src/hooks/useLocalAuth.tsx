@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { useQueryClient } from '@tanstack/react-query';
 import { localAuthStore, type LocalAccount } from '../auth/localAuthStore';
 import { validatePasswordComplexity, isPasswordRotationRequired } from '../lib/security/passwordPolicy';
-import { derivePasswordVerifier, verifyPassword } from '../auth/localAuthCrypto';
+import { derivePasswordVerifier, verifyPassword, generateEncryptionKey } from '../auth/localAuthCrypto';
 
 interface LocalAuthContextValue {
   isAuthenticated: boolean;
@@ -37,9 +37,8 @@ export function LocalAuthProvider({ children }: { children: ReactNode }) {
           if (account) {
             setCurrentAccount(account);
             setIsAuthenticated(true);
-            // Derive encryption key from session
-            const key = await derivePasswordVerifier(session.username, session.username);
-            setEncryptionKey(key.key);
+            // Do NOT derive key from placeholder - leave it null until re-login
+            setEncryptionKey(null);
           } else {
             await localAuthStore.clearSession();
           }
@@ -77,10 +76,13 @@ export function LocalAuthProvider({ children }: { children: ReactNode }) {
         throw new Error(complexityResult.errors.join('. '));
       }
 
-      // Create password verifier
-      const { salt, verifier, key } = await derivePasswordVerifier(username, password);
+      // Create password verifier (returns hex strings)
+      const { salt, verifier } = await derivePasswordVerifier(username, password);
 
-      // Create account
+      // Generate fresh encryption key for this session
+      const sessionKey = await generateEncryptionKey();
+
+      // Create account with hex string salt and verifier
       const account: LocalAccount = {
         username,
         salt,
@@ -94,7 +96,7 @@ export function LocalAuthProvider({ children }: { children: ReactNode }) {
 
       setCurrentAccount(account);
       setIsAuthenticated(true);
-      setEncryptionKey(key);
+      setEncryptionKey(sessionKey);
       setFailedAttempts(0);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Sign up failed');
@@ -116,7 +118,7 @@ export function LocalAuthProvider({ children }: { children: ReactNode }) {
         throw new Error('Invalid username or password');
       }
 
-      // Verify password
+      // Verify password (account.salt and account.verifier are hex strings)
       const isValid = await verifyPassword(password, account.salt, account.verifier);
       if (!isValid) {
         setFailedAttempts(prev => prev + 1);
@@ -128,15 +130,15 @@ export function LocalAuthProvider({ children }: { children: ReactNode }) {
         throw new Error('Password rotation required. Please update your password.');
       }
 
-      // Derive encryption key
-      const { key } = await derivePasswordVerifier(username, password);
+      // Generate fresh encryption key for this session
+      const sessionKey = await generateEncryptionKey();
 
       // Create session
       await localAuthStore.saveSession({ username, timestamp: Date.now() });
 
       setCurrentAccount(account);
       setIsAuthenticated(true);
-      setEncryptionKey(key);
+      setEncryptionKey(sessionKey);
       setFailedAttempts(0);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Sign in failed');
@@ -192,8 +194,11 @@ export function useLocalAuth() {
 }
 
 export function useEncryptionKey() {
-  const { encryptionKey } = useLocalAuth();
-  return encryptionKey;
+  const context = useContext(LocalAuthContext);
+  if (!context) {
+    return null;
+  }
+  return context.encryptionKey;
 }
 
 export function useFailedAttempts() {

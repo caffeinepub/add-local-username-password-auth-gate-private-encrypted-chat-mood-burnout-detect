@@ -29,11 +29,11 @@ export default function HeroSection({ onStartAnonymously }: HeroSectionProps) {
       className="relative min-h-screen flex items-center justify-center overflow-hidden px-4 py-20"
       aria-label="Hero section"
     >
-      {/* Animated gradient background */}
+      {/* Animated gradient background - Light theme */}
       <div
-        className="absolute inset-0 opacity-50"
+        className="absolute inset-0 opacity-40"
         style={{
-          background: 'linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0f1419 100%)',
+          background: 'linear-gradient(135deg, oklch(98% 0.02 260) 0%, oklch(96% 0.03 280) 50%, oklch(97% 0.02 240) 100%)',
           backgroundSize: '200% 200%',
           animation: prefersReducedMotion ? 'none' : 'var(--gradient-animation, none)',
         }}
@@ -43,12 +43,12 @@ export default function HeroSection({ onStartAnonymously }: HeroSectionProps) {
       {/* Neural particles overlay */}
       <NeuralParticlesOverlay />
 
-      {/* Background orbs */}
+      {/* Background orbs - Reduced opacity for light theme */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <img
           src="/assets/generated/mindvault-orbs.dim_1200x800.png"
           alt=""
-          className="absolute top-1/4 left-1/4 w-96 h-64 object-contain opacity-20 blur-3xl"
+          className="absolute top-1/4 left-1/4 w-96 h-64 object-contain opacity-10 blur-3xl"
         />
       </div>
 

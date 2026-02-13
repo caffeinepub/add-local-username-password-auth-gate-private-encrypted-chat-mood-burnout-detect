@@ -1,75 +1,125 @@
+import { MoodCategory } from '../../backend';
+
 export interface ClassificationResult {
-  mood: string;
+  category: MoodCategory;
   burnoutRisk: 'low' | 'medium' | 'high';
-  supportiveResponse: string;
+  shouldPromptTherapist: boolean;
 }
 
-const BURNOUT_KEYWORDS = [
-  'exhausted', 'tired', 'overwhelmed', 'stressed', 'burnout', 'burnt out',
-  'drained', 'can\'t cope', 'too much', 'breaking point', 'giving up',
-  'hopeless', 'helpless', 'anxious', 'depressed', 'struggling'
+const ANXIETY_KEYWORDS = [
+  'anxious', 'anxiety', 'worried', 'nervous', 'panic', 'scared', 'afraid',
+  'fear', 'terrified', 'overwhelmed', 'stressed', 'tense', 'uneasy'
 ];
 
-const NEGATIVE_MOOD_KEYWORDS = [
-  'sad', 'angry', 'frustrated', 'upset', 'worried', 'scared', 'afraid',
-  'lonely', 'isolated', 'worthless', 'failure', 'terrible', 'awful'
+const DEPRESSION_KEYWORDS = [
+  'depressed', 'depression', 'sad', 'hopeless', 'helpless', 'worthless',
+  'empty', 'numb', 'lonely', 'isolated', 'giving up', 'suicide', 'suicidal'
 ];
 
-const POSITIVE_MOOD_KEYWORDS = [
+const STRESS_KEYWORDS = [
+  'stressed', 'stress', 'exhausted', 'tired', 'burnout', 'burnt out',
+  'drained', 'can\'t cope', 'too much', 'breaking point', 'overwhelmed'
+];
+
+const POSITIVE_KEYWORDS = [
   'happy', 'good', 'great', 'excited', 'hopeful', 'grateful', 'thankful',
-  'better', 'improving', 'positive', 'optimistic'
+  'better', 'improving', 'positive', 'optimistic', 'wonderful', 'amazing'
+];
+
+const NEGATIVE_KEYWORDS = [
+  'angry', 'frustrated', 'upset', 'terrible', 'awful', 'horrible', 'bad'
 ];
 
 export function classifyMoodAndBurnout(text: string): ClassificationResult {
   const lowerText = text.toLowerCase();
   
   // Count keyword matches
-  const burnoutMatches = BURNOUT_KEYWORDS.filter(kw => lowerText.includes(kw)).length;
-  const negativeMatches = NEGATIVE_MOOD_KEYWORDS.filter(kw => lowerText.includes(kw)).length;
-  const positiveMatches = POSITIVE_MOOD_KEYWORDS.filter(kw => lowerText.includes(kw)).length;
+  const anxietyMatches = ANXIETY_KEYWORDS.filter(kw => lowerText.includes(kw)).length;
+  const depressionMatches = DEPRESSION_KEYWORDS.filter(kw => lowerText.includes(kw)).length;
+  const stressMatches = STRESS_KEYWORDS.filter(kw => lowerText.includes(kw)).length;
+  const positiveMatches = POSITIVE_KEYWORDS.filter(kw => lowerText.includes(kw)).length;
+  const negativeMatches = NEGATIVE_KEYWORDS.filter(kw => lowerText.includes(kw)).length;
+
+  // Determine primary category
+  let category: MoodCategory = MoodCategory.neutral;
+  const maxMatches = Math.max(anxietyMatches, depressionMatches, stressMatches, positiveMatches);
+  
+  if (maxMatches === 0) {
+    // No strong keywords, check for general negative/positive
+    if (negativeMatches > positiveMatches) {
+      category = MoodCategory.stress;
+    } else if (positiveMatches > 0) {
+      category = MoodCategory.positive;
+    }
+  } else if (anxietyMatches === maxMatches) {
+    category = MoodCategory.anxiety;
+  } else if (depressionMatches === maxMatches) {
+    category = MoodCategory.depression;
+  } else if (stressMatches === maxMatches) {
+    category = MoodCategory.stress;
+  } else if (positiveMatches === maxMatches) {
+    category = MoodCategory.positive;
+  }
 
   // Determine burnout risk
   let burnoutRisk: 'low' | 'medium' | 'high' = 'low';
-  if (burnoutMatches >= 3) {
+  const totalNegativeMatches = anxietyMatches + depressionMatches + stressMatches + negativeMatches;
+  
+  if (depressionMatches >= 2 || totalNegativeMatches >= 5) {
     burnoutRisk = 'high';
-  } else if (burnoutMatches >= 1 || negativeMatches >= 3) {
+  } else if (totalNegativeMatches >= 2 || anxietyMatches >= 2 || stressMatches >= 2) {
     burnoutRisk = 'medium';
   }
 
-  // Determine mood
-  let mood = 'neutral';
-  if (positiveMatches > negativeMatches) {
-    mood = 'positive';
-  } else if (negativeMatches > positiveMatches) {
-    mood = 'negative';
-  }
-
-  // Generate supportive response
-  const supportiveResponse = generateSupportiveResponse(mood, burnoutRisk, text);
+  // Should prompt therapist if burnout risk is medium or high
+  const shouldPromptTherapist = burnoutRisk === 'medium' || burnoutRisk === 'high';
 
   return {
-    mood,
+    category,
     burnoutRisk,
-    supportiveResponse,
+    shouldPromptTherapist,
   };
 }
 
-function generateSupportiveResponse(
-  mood: string,
-  burnoutRisk: 'low' | 'medium' | 'high',
-  originalText: string
-): string {
-  if (burnoutRisk === 'high') {
-    return "I hear that you're going through a really difficult time right now. What you're experiencing sounds overwhelming, and it's completely valid to feel this way. Please know that you don't have to face this alone. Taking care of your mental health is important, and reaching out for professional support can make a real difference.";
+// Classify from structured mood rating (e.g., 1-10 scale)
+export function classifyFromMoodRating(rating: number): ClassificationResult {
+  let category: MoodCategory = MoodCategory.neutral;
+  let burnoutRisk: 'low' | 'medium' | 'high' = 'low';
+
+  if (rating <= 3) {
+    category = MoodCategory.depression;
+    burnoutRisk = 'high';
+  } else if (rating <= 5) {
+    category = MoodCategory.stress;
+    burnoutRisk = 'medium';
+  } else if (rating <= 7) {
+    category = MoodCategory.neutral;
+    burnoutRisk = 'low';
+  } else {
+    category = MoodCategory.positive;
+    burnoutRisk = 'low';
   }
 
-  if (burnoutRisk === 'medium') {
-    return "Thank you for sharing what's on your mind. It sounds like you're dealing with some challenging feelings right now. Remember that it's okay to not be okay, and seeking support is a sign of strength. Taking small steps to care for yourself can help, and professional guidance might provide valuable perspective.";
+  return {
+    category,
+    burnoutRisk,
+    shouldPromptTherapist: burnoutRisk === 'medium' || burnoutRisk === 'high',
+  };
+}
+
+// Classify from key/value entry
+export function classifyFromEntry(key: string, value: string): ClassificationResult {
+  const lowerKey = key.toLowerCase();
+  const lowerValue = value.toLowerCase();
+
+  // Check if key suggests a mood rating
+  if (lowerKey.includes('mood') || lowerKey.includes('feeling') || lowerKey.includes('rating')) {
+    const numericValue = parseInt(value);
+    if (!isNaN(numericValue) && numericValue >= 1 && numericValue <= 10) {
+      return classifyFromMoodRating(numericValue);
+    }
   }
 
-  if (mood === 'positive') {
-    return "It's wonderful to hear some positive energy in your message! While things may be going well, remember that maintaining your mental wellness is an ongoing journey. If you ever need support or just want to talk things through, professional guidance can be valuable at any stage.";
-  }
-
-  return "Thank you for sharing your thoughts. Everyone's mental health journey is unique, and it's important to check in with yourself regularly. Whether you're feeling great or facing challenges, having a professional to talk to can provide valuable insights and support.";
+  // Otherwise treat value as free text
+  return classifyMoodAndBurnout(value);
 }

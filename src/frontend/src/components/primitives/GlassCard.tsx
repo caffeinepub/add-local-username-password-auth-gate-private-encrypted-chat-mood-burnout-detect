@@ -1,5 +1,6 @@
 import { forwardRef, type HTMLAttributes, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
+import { getZoomTransition } from '@/lib/motion';
 
 export interface GlassCardProps extends HTMLAttributes<HTMLDivElement> {
   children?: ReactNode;
@@ -7,11 +8,14 @@ export interface GlassCardProps extends HTMLAttributes<HTMLDivElement> {
 
 const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
   ({ className, ...props }, ref) => {
+    const transitionStyle = `transition-all ${getZoomTransition('component')}`;
+    
     return (
       <div
         ref={ref}
         className={cn(
-          'glass-card transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-accent/10 focus-within:scale-105 focus-within:shadow-xl focus-within:shadow-accent/10',
+          'glass-card hover:scale-[1.02] hover:shadow-lg focus-within:scale-[1.02] focus-within:shadow-lg',
+          transitionStyle,
           className
         )}
         {...props}

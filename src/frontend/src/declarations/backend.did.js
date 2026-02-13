@@ -19,10 +19,28 @@ export const Message = IDL.Record({
   'author' : IDL.Principal,
   'timestamp' : Time,
 });
+export const MoodCategory = IDL.Variant({
+  'stress' : IDL.Null,
+  'anxiety' : IDL.Null,
+  'depression' : IDL.Null,
+  'positive' : IDL.Null,
+  'neutral' : IDL.Null,
+});
+export const SessionRequest = IDL.Record({
+  'message' : IDL.Text,
+  'timestamp' : Time,
+  'category' : MoodCategory,
+  'caller' : IDL.Principal,
+});
 export const UserProfile = IDL.Record({
   'name' : IDL.Text,
   'email' : IDL.Text,
   'registeredAt' : Time,
+});
+export const EncryptedMessage = IDL.Record({
+  'author' : IDL.Opt(IDL.Principal),
+  'timestamp' : Time,
+  'encryptedText' : IDL.Vec(IDL.Nat8),
 });
 export const DataEntry = IDL.Record({
   'key' : IDL.Text,
@@ -36,10 +54,22 @@ export const idlService = IDL.Service({
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'clearMessages' : IDL.Func([], [], []),
   'getAllMessages' : IDL.Func([], [IDL.Vec(Message)], ['query']),
+  'getAllSessionRequests' : IDL.Func([], [IDL.Vec(SessionRequest)], ['query']),
   'getAllUsers' : IDL.Func([], [IDL.Vec(IDL.Principal)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+  'getMySessionRequests' : IDL.Func([], [IDL.Vec(SessionRequest)], ['query']),
+  'getRecentEncryptedMessages' : IDL.Func(
+      [IDL.Nat],
+      [IDL.Vec(EncryptedMessage)],
+      ['query'],
+    ),
   'getRecentMessages' : IDL.Func([IDL.Nat], [IDL.Vec(Message)], ['query']),
+  'getSessionRequestsByCategory' : IDL.Func(
+      [MoodCategory],
+      [IDL.Vec(SessionRequest)],
+      ['query'],
+    ),
   'getSystemStats' : IDL.Func(
       [],
       [
@@ -51,14 +81,29 @@ export const idlService = IDL.Service({
       ],
       ['query'],
     ),
+  'getTemplatesForCategory' : IDL.Func(
+      [MoodCategory],
+      [
+        IDL.Opt(
+          IDL.Record({
+            'insightTemplates' : IDL.Vec(IDL.Text),
+            'reassuranceTemplates' : IDL.Vec(IDL.Text),
+          })
+        ),
+      ],
+      ['query'],
+    ),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(UserProfile)],
       ['query'],
     ),
+  'initializeMoodCategoryTemplates' : IDL.Func([], [], ['oneway']),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'listEntries' : IDL.Func([], [IDL.Vec(DataEntry)], []),
+  'postEncryptedMessage' : IDL.Func([IDL.Vec(IDL.Nat8)], [], []),
   'postMessage' : IDL.Func([IDL.Text], [], []),
+  'requestSession' : IDL.Func([MoodCategory, IDL.Text], [], []),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   'submitEntry' : IDL.Func([IDL.Text, IDL.Text], [], []),
 });
@@ -77,10 +122,28 @@ export const idlFactory = ({ IDL }) => {
     'author' : IDL.Principal,
     'timestamp' : Time,
   });
+  const MoodCategory = IDL.Variant({
+    'stress' : IDL.Null,
+    'anxiety' : IDL.Null,
+    'depression' : IDL.Null,
+    'positive' : IDL.Null,
+    'neutral' : IDL.Null,
+  });
+  const SessionRequest = IDL.Record({
+    'message' : IDL.Text,
+    'timestamp' : Time,
+    'category' : MoodCategory,
+    'caller' : IDL.Principal,
+  });
   const UserProfile = IDL.Record({
     'name' : IDL.Text,
     'email' : IDL.Text,
     'registeredAt' : Time,
+  });
+  const EncryptedMessage = IDL.Record({
+    'author' : IDL.Opt(IDL.Principal),
+    'timestamp' : Time,
+    'encryptedText' : IDL.Vec(IDL.Nat8),
   });
   const DataEntry = IDL.Record({
     'key' : IDL.Text,
@@ -94,10 +157,26 @@ export const idlFactory = ({ IDL }) => {
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'clearMessages' : IDL.Func([], [], []),
     'getAllMessages' : IDL.Func([], [IDL.Vec(Message)], ['query']),
+    'getAllSessionRequests' : IDL.Func(
+        [],
+        [IDL.Vec(SessionRequest)],
+        ['query'],
+      ),
     'getAllUsers' : IDL.Func([], [IDL.Vec(IDL.Principal)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+    'getMySessionRequests' : IDL.Func([], [IDL.Vec(SessionRequest)], ['query']),
+    'getRecentEncryptedMessages' : IDL.Func(
+        [IDL.Nat],
+        [IDL.Vec(EncryptedMessage)],
+        ['query'],
+      ),
     'getRecentMessages' : IDL.Func([IDL.Nat], [IDL.Vec(Message)], ['query']),
+    'getSessionRequestsByCategory' : IDL.Func(
+        [MoodCategory],
+        [IDL.Vec(SessionRequest)],
+        ['query'],
+      ),
     'getSystemStats' : IDL.Func(
         [],
         [
@@ -109,14 +188,29 @@ export const idlFactory = ({ IDL }) => {
         ],
         ['query'],
       ),
+    'getTemplatesForCategory' : IDL.Func(
+        [MoodCategory],
+        [
+          IDL.Opt(
+            IDL.Record({
+              'insightTemplates' : IDL.Vec(IDL.Text),
+              'reassuranceTemplates' : IDL.Vec(IDL.Text),
+            })
+          ),
+        ],
+        ['query'],
+      ),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(UserProfile)],
         ['query'],
       ),
+    'initializeMoodCategoryTemplates' : IDL.Func([], [], ['oneway']),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'listEntries' : IDL.Func([], [IDL.Vec(DataEntry)], []),
+    'postEncryptedMessage' : IDL.Func([IDL.Vec(IDL.Nat8)], [], []),
     'postMessage' : IDL.Func([IDL.Text], [], []),
+    'requestSession' : IDL.Func([MoodCategory, IDL.Text], [], []),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
     'submitEntry' : IDL.Func([IDL.Text, IDL.Text], [], []),
   });

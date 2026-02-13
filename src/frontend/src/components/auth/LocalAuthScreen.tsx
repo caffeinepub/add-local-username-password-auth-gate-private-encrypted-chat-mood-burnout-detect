@@ -7,8 +7,13 @@ import { Loader2, Lock, User, AlertCircle } from 'lucide-react';
 import { useLocalAuth } from '@/hooks/useLocalAuth';
 import { getPasswordRequirementsText, getRotationWindowText } from '@/lib/security/passwordPolicy';
 import LocalCaptcha from './LocalCaptcha';
+import GoBackButton from '../navigation/GoBackButton';
 
-export default function LocalAuthScreen() {
+interface LocalAuthScreenProps {
+  onGoBack?: () => void;
+}
+
+export default function LocalAuthScreen({ onGoBack }: LocalAuthScreenProps) {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -56,6 +61,13 @@ export default function LocalAuthScreen() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0a0a0f] to-[#0f1419] flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md space-y-6">
+        {/* Go back button at the top */}
+        {onGoBack && (
+          <div className="flex justify-start">
+            <GoBackButton onGoBack={onGoBack} />
+          </div>
+        )}
+
         <div className="text-center space-y-2">
           <div className="flex justify-center">
             <div className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center">

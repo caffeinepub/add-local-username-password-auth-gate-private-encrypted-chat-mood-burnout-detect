@@ -1,5 +1,6 @@
 import { Component, type ReactNode, type ErrorInfo } from 'react';
 import { Button } from '../primitives/Button';
+import { logNavigationContext } from '@/utils/errorBoundaryDiagnostics';
 
 interface Props {
   children: ReactNode;
@@ -21,11 +22,13 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Error caught by boundary:', error, errorInfo);
+    // Enhanced logging with navigation context for debugging
+    logNavigationContext(error, errorInfo);
   }
 
   handleRetry = () => {
-    this.setState({ hasError: false, error: undefined });
+    // Deterministic recovery: full page reload to ensure clean state
+    window.location.reload();
   };
 
   render() {

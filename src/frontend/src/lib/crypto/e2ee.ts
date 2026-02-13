@@ -65,3 +65,17 @@ export function parseEncryptedMessage(text: string): EncryptedMessage | null {
 export function serializeEncryptedMessage(encrypted: EncryptedMessage): string {
   return JSON.stringify(encrypted);
 }
+
+export function encryptedMessageToBytes(encrypted: EncryptedMessage): Uint8Array {
+  const serialized = serializeEncryptedMessage(encrypted);
+  return new TextEncoder().encode(serialized);
+}
+
+export function bytesToEncryptedMessage(bytes: Uint8Array): EncryptedMessage | null {
+  try {
+    const text = new TextDecoder().decode(bytes);
+    return parseEncryptedMessage(text);
+  } catch {
+    return null;
+  }
+}

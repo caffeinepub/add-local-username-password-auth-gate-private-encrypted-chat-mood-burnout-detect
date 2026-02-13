@@ -1,169 +1,73 @@
 {
   "kind": "build_request",
-  "title": "Add local username/password auth gate, private encrypted chat, mood/burnout detection, and therapist prompt flow",
+  "title": "Fix intermittent crash when opening 'Start Anonymously' after navigating through Login/Chat",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-20",
-      "text": "Add a custom local username/password authentication system that must be completed before a user can access the Anonymous Chat experience.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-4",
-          "msg-6",
-          "msg-8",
-          "msg-9"
-        ],
-        "quotes": [
-          "now add the local user login before the chat feature",
-          "a custom username password system which includes high security detail",
-          "apply both simultaneously"
-        ]
-      },
-      "acceptanceCriteria": [
-        "When the user clicks the existing CTA that currently opens the experience, they are routed to a local sign-in/sign-up flow instead of the chat UI unless already authenticated",
-        "After successful local login, the user can access the experience view (chat + data entry) without errors",
-        "Logout is available and returns the user to the pre-login state, preventing access to chat until login again"
-      ]
-    },
-    {
-      "id": "REQ-21",
-      "text": "Implement secure credential handling for local auth: secure storage, robust transmission, strict user policies including password complexity AND password rotation enforced simultaneously.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-6",
-          "msg-8",
-          "msg-9"
-        ],
-        "quotes": [
-          "includes high security detail , as in secure storage,  robust transmission, strict user policy",
-          "apply both simultaneously"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Signup rejects passwords that do not meet a strict complexity policy (define and display requirements in the UI)",
-        "Login/signup flows enforce a password rotation policy (define and display the rotation window and required behavior)",
-        "Passwords are never stored or returned in plaintext by the backend; only non-sensitive account metadata may be returned",
-        "Frontend does not log passwords or include them in query keys / URLs / local storage"
-      ]
-    },
-    {
-      "id": "REQ-22",
-      "text": "Add a simple local CAPTCHA-style challenge as an additional authentication layer during account creation and/or sign-in, implemented without third-party services.",
+      "id": "REQ-1",
+      "text": "Eliminate the intermittent \"Something unexpected happened\" crash when the user clicks \"Start Anonymously\" after navigating through the login flow and the anonymous chat experience, ensuring the Experience view always opens reliably.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-6",
-          "msg-8"
+          "msg-1"
         ],
         "quotes": [
-          "captcha verification",
-          "simple local challenge"
+          "now the start anonymously page wont open, shows something unexpected happened",
+          "most recent, starting page after i try to go into the login page and through the chat page",
+          "only sometimes"
         ]
       },
       "acceptanceCriteria": [
-        "Auth screens include a local challenge step that must be passed before submitting credentials",
-        "The challenge regenerates on demand and after repeated failed attempts",
-        "User-facing errors are shown in English and do not expose internal details"
+        "From the landing page, clicking \"Start Anonymously\" always opens the Experience view without triggering the global ErrorBoundary screen.",
+        "After entering the login flow (Internet Identity choice screen and/or local auth screen) and visiting the Anonymous Chat tab, clicking \"Start Anonymously\" again reliably opens the Experience view.",
+        "QA can repeat the navigation path multiple times (including browser back) without intermittent failures."
       ]
     },
     {
-      "id": "REQ-23",
-      "text": "Extend the Motoko backend to support local user accounts and sessions suitable for gating access to chat/data-entry APIs, while keeping to the single-actor architecture.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-4",
-          "msg-6"
-        ],
-        "quotes": [
-          "add the local user login before the chat feature",
-          "a custom username password system"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Backend exposes canister methods needed for sign-up, sign-in, sign-out, and checking current auth status",
-        "Chat and data-entry write operations are rejected when the caller is not locally authenticated",
-        "Existing chat retrieval and data listing continue to work as expected for authenticated users",
-        "State is persisted across upgrades using stable storage; if a migration is required, it is implemented using backend/migration.mo per the conditional migration policy"
-      ]
-    },
-    {
-      "id": "REQ-24",
-      "text": "Implement a simplified private encryption layer for anonymous chat such that messages are end-to-end encrypted between clients and also encrypted for storage/transport on the platform (store ciphertext, not plaintext).",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-4",
-          "msg-6",
-          "msg-8"
-        ],
-        "quotes": [
-          "create end to end encryption comms using protocols like open source signal protocol",
-          "yes you can use the simplified encryption layer but make it so that it should be private",
-          "both, e2ee between clients and storage/transport on the IC"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Frontend encrypts outgoing chat messages before sending them to the backend; backend stores and returns encrypted payloads rather than plaintext",
-        "Frontend decrypts messages for display when it has the required key material; if it cannot decrypt, it shows a clear English placeholder state (without leaking ciphertext as normal text)",
-        "No third-party encryption services/protocol implementations are introduced; the solution remains a simplified, app-contained approach",
-        "The encryption feature does not break the existing polling/refresh behavior of the chat UI (React Query refetch interval)"
-      ]
-    },
-    {
-      "id": "REQ-25",
-      "text": "Add an IC-hosted/on-device rule-based classifier that analyzes submitted chat text to identify mood and mental burnout signals, and generate a deterministic, rule-based supportive response.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-4",
-          "msg-6"
-        ],
-        "quotes": [
-          "use the consensus AI for the identification of moods and mental burnouts",
-          "yes a simple on device/IC-hosted rule-based classifier"
-        ]
-      },
-      "acceptanceCriteria": [
-        "When a user submits a chat message, the app produces a rule-based analysis result (e.g., mood label and burnout risk level) and a supportive response text in English",
-        "The classifier is rule-based (no external AI API calls) and runs within platform constraints",
-        "The user can see the generated supportive response as part of the chat flow (clearly identified as a system/assistant response)"
-      ]
-    },
-    {
-      "id": "REQ-26",
-      "text": "After the system produces the supportive response to the submitted chat text, present a dedicated screen (or modal step) that offers to connect the user to a licensed therapist and states that the first session will be free if the user proceeds.",
+      "id": "REQ-2",
+      "text": "Make landing/experience navigation state robust by keeping the UI state in MindVaultLandingPage in sync with browser history state during open/close and back navigation (including repeated open/close cycles).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-1"
         ],
         "quotes": [
-          "then show a screen we will be connecting you to a licensed therapist if you wish to proceed , the first session will be free"
+          "only sometimes"
         ]
       },
       "acceptanceCriteria": [
-        "After the supportive response is shown, the user is prompted with a clear English UI offering to proceed to therapist connection and stating the first session is free",
-        "The user can choose to proceed or decline and return to the chat experience without losing the current conversation state",
-        "No external therapist scheduling/payment integrations are added; the screen is an in-app prompt/flow only"
+        "Closing the Experience view returns the user to the landing view without leaving history/state in an inconsistent condition.",
+        "Using the browser back button after opening the Experience view returns to the landing view without triggering an error screen.",
+        "Repeated cycles of open Experience -> navigate within Experience (login/chat) -> close/back -> open Experience do not accumulate invalid history states."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Improve diagnostics for this crash by capturing and surfacing the underlying runtime error details when the ErrorBoundary is hit (while keeping user-facing copy in English and unchanged in meaning).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "shows something unexpected happened"
+        ]
+      },
+      "acceptanceCriteria": [
+        "When the ErrorBoundary renders, the console includes the original error plus enough context to debug navigation (at minimum: current URL, history.state, whether Experience was intended to be open).",
+        "Clicking \"Try Again\" results in a deterministic recovery behavior (either successfully re-rendering the app state or performing a full reload), instead of returning to a broken state."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor in backend/main.mo; add backend/migration.mo only if needed for stable state upgrades",
-    "Do not modify files under frontend/src/components/ui (read-only shadcn components) or immutable hook entrypoints listed in SYSTEM_CONTEXT",
-    "No third-party authentication providers; implement only the requested custom username/password system",
-    "No external CAPTCHA services; CAPTCHA must be a local challenge",
-    "No external AI/LLM APIs; mood/burnout detection must be rule-based and IC-hosted/on-device",
-    "Signal Protocol is not required/assumed; implement a simplified private encryption approach within constraints"
+    "Do not edit files under frontend/src/components/ui (read-only shadcn components).",
+    "Do not edit immutable hook entrypoints listed by SYSTEM_CONTEXT (compose around them instead).",
+    "Keep all backend logic in the single Motoko actor (no new backend services)."
   ],
   "nonGoals": [
-    "Real-time messaging via websockets or push notifications",
-    "Integration with external therapist networks, booking systems, email/SMS, or payments",
-    "Implementing the full Signal Protocol specification",
-    "Adding third-party identity providers beyond the existing Internet Identity hook (do not rely on it for the requested local auth)"
+    "Do not add new authentication providers beyond Internet Identity and existing local auth.",
+    "Do not redesign the marketing/landing page content beyond what is necessary to fix navigation reliability.",
+    "Do not change mood template/preset functionality as part of this fix unless it is directly implicated in the crash."
   ],
   "imageRequirements": {
     "required": [],

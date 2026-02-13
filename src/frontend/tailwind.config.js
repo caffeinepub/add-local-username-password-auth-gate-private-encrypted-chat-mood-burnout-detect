@@ -48,6 +48,10 @@ export default {
                 card: {
                     DEFAULT: 'oklch(var(--card))',
                     foreground: 'oklch(var(--card-foreground))'
+                },
+                'popup-glow': {
+                    primary: 'oklch(var(--popup-glow-primary) / <alpha-value>)',
+                    secondary: 'oklch(var(--popup-glow-secondary) / <alpha-value>)'
                 }
             },
             borderRadius: {
@@ -57,7 +61,8 @@ export default {
             },
             boxShadow: {
                 xs: '0 1px 2px 0 rgba(0,0,0,0.05)',
-                glow: '0 0 20px rgba(34, 211, 238, 0.3)'
+                glow: '0 0 20px rgba(34, 211, 238, 0.3)',
+                'popup-glow': '0 0 24px oklch(var(--popup-glow-primary) / 0.4), 0 0 48px oklch(var(--popup-glow-secondary) / 0.2)'
             },
             keyframes: {
                 'accordion-down': {

@@ -89,22 +89,40 @@ export class ExternalBlob {
         return this;
     }
 }
-export interface Message {
-    text: string;
-    author: Principal;
-    timestamp: Time;
-}
 export type Time = bigint;
-export interface UserProfile {
-    name: string;
-    email: string;
-    registeredAt: Time;
-}
 export interface DataEntry {
     key: string;
     value: string;
     author: Principal;
     timestamp: Time;
+}
+export interface Message {
+    text: string;
+    author: Principal;
+    timestamp: Time;
+}
+export interface EncryptedMessage {
+    author?: Principal;
+    timestamp: Time;
+    encryptedText: Uint8Array;
+}
+export interface UserProfile {
+    name: string;
+    email: string;
+    registeredAt: Time;
+}
+export interface SessionRequest {
+    message: string;
+    timestamp: Time;
+    category: MoodCategory;
+    caller: Principal;
+}
+export enum MoodCategory {
+    stress = "stress",
+    anxiety = "anxiety",
+    depression = "depression",
+    positive = "positive",
+    neutral = "neutral"
 }
 export enum UserRole {
     admin = "admin",
@@ -116,23 +134,34 @@ export interface backendInterface {
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     clearMessages(): Promise<void>;
     getAllMessages(): Promise<Array<Message>>;
+    getAllSessionRequests(): Promise<Array<SessionRequest>>;
     getAllUsers(): Promise<Array<Principal>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
+    getMySessionRequests(): Promise<Array<SessionRequest>>;
+    getRecentEncryptedMessages(count: bigint): Promise<Array<EncryptedMessage>>;
     getRecentMessages(_count: bigint): Promise<Array<Message>>;
+    getSessionRequestsByCategory(category: MoodCategory): Promise<Array<SessionRequest>>;
     getSystemStats(): Promise<{
         totalEntries: bigint;
         totalMessages: bigint;
         totalUsers: bigint;
     }>;
+    getTemplatesForCategory(category: MoodCategory): Promise<{
+        insightTemplates: Array<string>;
+        reassuranceTemplates: Array<string>;
+    } | null>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
+    initializeMoodCategoryTemplates(): Promise<void>;
     isCallerAdmin(): Promise<boolean>;
     listEntries(): Promise<Array<DataEntry>>;
+    postEncryptedMessage(encryptedText: Uint8Array): Promise<void>;
     postMessage(text: string): Promise<void>;
+    requestSession(category: MoodCategory, message: string): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     submitEntry(key: string, value: string): Promise<void>;
 }
-import type { UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
+import type { EncryptedMessage as _EncryptedMessage, MoodCategory as _MoodCategory, SessionRequest as _SessionRequest, Time as _Time, UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async _initializeAccessControlWithSecret(arg0: string): Promise<void> {
@@ -191,6 +220,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async getAllSessionRequests(): Promise<Array<SessionRequest>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAllSessionRequests();
+                return from_candid_vec_n3(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAllSessionRequests();
+            return from_candid_vec_n3(this._uploadFile, this._downloadFile, result);
+        }
+    }
     async getAllUsers(): Promise<Array<Principal>> {
         if (this.processError) {
             try {
@@ -209,28 +252,56 @@ export class Backend implements backendInterface {
         if (this.processError) {
             try {
                 const result = await this.actor.getCallerUserProfile();
-                return from_candid_opt_n3(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n8(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getCallerUserProfile();
-            return from_candid_opt_n3(this._uploadFile, this._downloadFile, result);
+            return from_candid_opt_n8(this._uploadFile, this._downloadFile, result);
         }
     }
     async getCallerUserRole(): Promise<UserRole> {
         if (this.processError) {
             try {
                 const result = await this.actor.getCallerUserRole();
-                return from_candid_UserRole_n4(this._uploadFile, this._downloadFile, result);
+                return from_candid_UserRole_n9(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getCallerUserRole();
-            return from_candid_UserRole_n4(this._uploadFile, this._downloadFile, result);
+            return from_candid_UserRole_n9(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getMySessionRequests(): Promise<Array<SessionRequest>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getMySessionRequests();
+                return from_candid_vec_n3(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getMySessionRequests();
+            return from_candid_vec_n3(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getRecentEncryptedMessages(arg0: bigint): Promise<Array<EncryptedMessage>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getRecentEncryptedMessages(arg0);
+                return from_candid_vec_n11(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getRecentEncryptedMessages(arg0);
+            return from_candid_vec_n11(this._uploadFile, this._downloadFile, result);
         }
     }
     async getRecentMessages(arg0: bigint): Promise<Array<Message>> {
@@ -245,6 +316,20 @@ export class Backend implements backendInterface {
         } else {
             const result = await this.actor.getRecentMessages(arg0);
             return result;
+        }
+    }
+    async getSessionRequestsByCategory(arg0: MoodCategory): Promise<Array<SessionRequest>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getSessionRequestsByCategory(to_candid_MoodCategory_n15(this._uploadFile, this._downloadFile, arg0));
+                return from_candid_vec_n3(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getSessionRequestsByCategory(to_candid_MoodCategory_n15(this._uploadFile, this._downloadFile, arg0));
+            return from_candid_vec_n3(this._uploadFile, this._downloadFile, result);
         }
     }
     async getSystemStats(): Promise<{
@@ -265,18 +350,49 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async getTemplatesForCategory(arg0: MoodCategory): Promise<{
+        insightTemplates: Array<string>;
+        reassuranceTemplates: Array<string>;
+    } | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getTemplatesForCategory(to_candid_MoodCategory_n15(this._uploadFile, this._downloadFile, arg0));
+                return from_candid_opt_n17(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getTemplatesForCategory(to_candid_MoodCategory_n15(this._uploadFile, this._downloadFile, arg0));
+            return from_candid_opt_n17(this._uploadFile, this._downloadFile, result);
+        }
+    }
     async getUserProfile(arg0: Principal): Promise<UserProfile | null> {
         if (this.processError) {
             try {
                 const result = await this.actor.getUserProfile(arg0);
-                return from_candid_opt_n3(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n8(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getUserProfile(arg0);
-            return from_candid_opt_n3(this._uploadFile, this._downloadFile, result);
+            return from_candid_opt_n8(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async initializeMoodCategoryTemplates(): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.initializeMoodCategoryTemplates();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.initializeMoodCategoryTemplates();
+            return result;
         }
     }
     async isCallerAdmin(): Promise<boolean> {
@@ -307,6 +423,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async postEncryptedMessage(arg0: Uint8Array): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.postEncryptedMessage(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.postEncryptedMessage(arg0);
+            return result;
+        }
+    }
     async postMessage(arg0: string): Promise<void> {
         if (this.processError) {
             try {
@@ -318,6 +448,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.postMessage(arg0);
+            return result;
+        }
+    }
+    async requestSession(arg0: MoodCategory, arg1: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.requestSession(to_candid_MoodCategory_n15(this._uploadFile, this._downloadFile, arg0), arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.requestSession(to_candid_MoodCategory_n15(this._uploadFile, this._downloadFile, arg0), arg1);
             return result;
         }
     }
@@ -350,13 +494,67 @@ export class Backend implements backendInterface {
         }
     }
 }
-function from_candid_UserRole_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserRole): UserRole {
-    return from_candid_variant_n5(_uploadFile, _downloadFile, value);
+function from_candid_EncryptedMessage_n12(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _EncryptedMessage): EncryptedMessage {
+    return from_candid_record_n13(_uploadFile, _downloadFile, value);
 }
-function from_candid_opt_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_UserProfile]): UserProfile | null {
+function from_candid_MoodCategory_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _MoodCategory): MoodCategory {
+    return from_candid_variant_n7(_uploadFile, _downloadFile, value);
+}
+function from_candid_SessionRequest_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _SessionRequest): SessionRequest {
+    return from_candid_record_n5(_uploadFile, _downloadFile, value);
+}
+function from_candid_UserRole_n9(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserRole): UserRole {
+    return from_candid_variant_n10(_uploadFile, _downloadFile, value);
+}
+function from_candid_opt_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [Principal]): Principal | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_variant_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+function from_candid_opt_n17(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [{
+        insightTemplates: Array<string>;
+        reassuranceTemplates: Array<string>;
+    }]): {
+    insightTemplates: Array<string>;
+    reassuranceTemplates: Array<string>;
+} | null {
+    return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_UserProfile]): UserProfile | null {
+    return value.length === 0 ? null : value[0];
+}
+function from_candid_record_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    author: [] | [Principal];
+    timestamp: _Time;
+    encryptedText: Uint8Array;
+}): {
+    author?: Principal;
+    timestamp: Time;
+    encryptedText: Uint8Array;
+} {
+    return {
+        author: record_opt_to_undefined(from_candid_opt_n14(_uploadFile, _downloadFile, value.author)),
+        timestamp: value.timestamp,
+        encryptedText: value.encryptedText
+    };
+}
+function from_candid_record_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    message: string;
+    timestamp: _Time;
+    category: _MoodCategory;
+    caller: Principal;
+}): {
+    message: string;
+    timestamp: Time;
+    category: MoodCategory;
+    caller: Principal;
+} {
+    return {
+        message: value.message,
+        timestamp: value.timestamp,
+        category: from_candid_MoodCategory_n6(_uploadFile, _downloadFile, value.category),
+        caller: value.caller
+    };
+}
+function from_candid_variant_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     admin: null;
 } | {
     user: null;
@@ -365,8 +563,53 @@ function from_candid_variant_n5(_uploadFile: (file: ExternalBlob) => Promise<Uin
 }): UserRole {
     return "admin" in value ? UserRole.admin : "user" in value ? UserRole.user : "guest" in value ? UserRole.guest : value;
 }
+function from_candid_variant_n7(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    stress: null;
+} | {
+    anxiety: null;
+} | {
+    depression: null;
+} | {
+    positive: null;
+} | {
+    neutral: null;
+}): MoodCategory {
+    return "stress" in value ? MoodCategory.stress : "anxiety" in value ? MoodCategory.anxiety : "depression" in value ? MoodCategory.depression : "positive" in value ? MoodCategory.positive : "neutral" in value ? MoodCategory.neutral : value;
+}
+function from_candid_vec_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_EncryptedMessage>): Array<EncryptedMessage> {
+    return value.map((x)=>from_candid_EncryptedMessage_n12(_uploadFile, _downloadFile, x));
+}
+function from_candid_vec_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_SessionRequest>): Array<SessionRequest> {
+    return value.map((x)=>from_candid_SessionRequest_n4(_uploadFile, _downloadFile, x));
+}
+function to_candid_MoodCategory_n15(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: MoodCategory): _MoodCategory {
+    return to_candid_variant_n16(_uploadFile, _downloadFile, value);
+}
 function to_candid_UserRole_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): _UserRole {
     return to_candid_variant_n2(_uploadFile, _downloadFile, value);
+}
+function to_candid_variant_n16(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: MoodCategory): {
+    stress: null;
+} | {
+    anxiety: null;
+} | {
+    depression: null;
+} | {
+    positive: null;
+} | {
+    neutral: null;
+} {
+    return value == MoodCategory.stress ? {
+        stress: null
+    } : value == MoodCategory.anxiety ? {
+        anxiety: null
+    } : value == MoodCategory.depression ? {
+        depression: null
+    } : value == MoodCategory.positive ? {
+        positive: null
+    } : value == MoodCategory.neutral ? {
+        neutral: null
+    } : value;
 }
 function to_candid_variant_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): {
     admin: null;

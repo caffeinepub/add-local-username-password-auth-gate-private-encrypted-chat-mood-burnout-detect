@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
 import HeroSection from '../components/sections/HeroSection';
 import CoreEmotionalQuestionSection from '../components/sections/CoreEmotionalQuestionSection';
 import HowItWorksSection from '../components/sections/HowItWorksSection';
@@ -9,26 +9,33 @@ import FAQSection from '../components/sections/FAQSection';
 import FinalCTASection from '../components/sections/FinalCTASection';
 import Footer from '../components/layout/Footer';
 import ExperienceView from '../components/experience/ExperienceView';
+import ZoomPageTransition from '../components/motion/ZoomPageTransition';
+import ZoomInView from '../components/motion/ZoomInView';
+import { useExperienceNavigationState } from '../hooks/useExperienceNavigationState';
+import { setExperienceIntendedOpen } from '../utils/errorBoundaryDiagnostics';
 
 export default function MindVaultLandingPage() {
-  const [showExperience, setShowExperience] = useState(false);
+  const { isExperienceOpen, isInitialized, openExperience, closeExperience } = useExperienceNavigationState();
 
-  const handleOpenExperience = () => {
-    setShowExperience(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  // Update diagnostic flag whenever experience state changes
+  useEffect(() => {
+    setExperienceIntendedOpen(isExperienceOpen);
+  }, [isExperienceOpen]);
 
-  const handleCloseExperience = () => {
-    setShowExperience(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  if (showExperience) {
-    return <ExperienceView onClose={handleCloseExperience} />;
+  // Don't render until navigation state is initialized to prevent flash
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 border-4 border-muted border-t-accent rounded-full animate-spin mx-auto" />
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0a0a0f] to-[#0f1419] text-foreground">
+  const landingContent = (
+    <div className="min-h-screen bg-background text-foreground">
       {/* Skip to content link for accessibility */}
       <a
         href="#main-content"
@@ -38,17 +45,52 @@ export default function MindVaultLandingPage() {
       </a>
 
       <main id="main-content" className="relative">
-        <HeroSection onStartAnonymously={handleOpenExperience} />
-        <CoreEmotionalQuestionSection />
-        <HowItWorksSection />
-        <FeaturesGridSection />
-        <CorporateBurnoutInsightSection />
-        <PrivacyTrustSection />
-        <FAQSection />
-        <FinalCTASection onStartMindVault={handleOpenExperience} />
+        <ZoomInView>
+          <HeroSection onStartAnonymously={openExperience} />
+        </ZoomInView>
+        
+        <ZoomInView>
+          <CoreEmotionalQuestionSection />
+        </ZoomInView>
+        
+        <ZoomInView>
+          <HowItWorksSection />
+        </ZoomInView>
+        
+        <ZoomInView>
+          <FeaturesGridSection />
+        </ZoomInView>
+        
+        <ZoomInView>
+          <CorporateBurnoutInsightSection />
+        </ZoomInView>
+        
+        <ZoomInView>
+          <PrivacyTrustSection />
+        </ZoomInView>
+        
+        <ZoomInView>
+          <FAQSection />
+        </ZoomInView>
+        
+        <ZoomInView>
+          <FinalCTASection onStartMindVault={openExperience} />
+        </ZoomInView>
       </main>
 
       <Footer />
     </div>
+  );
+
+  const experienceContent = (
+    <ExperienceView onClose={closeExperience} />
+  );
+
+  return (
+    <ZoomPageTransition
+      showExperience={isExperienceOpen}
+      landingContent={landingContent}
+      experienceContent={experienceContent}
+    />
   );
 }

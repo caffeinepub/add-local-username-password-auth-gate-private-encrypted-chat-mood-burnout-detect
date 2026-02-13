@@ -2,13 +2,12 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-a-custom-local-username-password-authentication-system-that-must-be-completed-before-a-user-can-access-the-anonymous-chat-experience",
-      "featureTitle": "Add a custom local username/password authentication system that must be completed before a user can access the Anonymous Chat experience.",
+      "featureId": "feature-eliminate-the-intermittent-something-unexpected-happened-crash-when-the-user-clicks-start-anonymously-after-navigating-through-the-login-flow-and-the-anonymous-chat-experience-ensuring-the-experience-view-always-opens-reliably",
+      "featureTitle": "Eliminate the intermittent \"Something unexpected happened\" crash when the user clicks \"Start Anonymously\" after navigating through the login flow and the anonymous chat experience, ensuring the Experience view always opens reliably.",
       "files": [
-        "frontend/src/auth/localAuthStore.ts",
-        "frontend/src/components/auth/LocalAuthScreen.tsx",
         "frontend/src/components/experience/ExperienceView.tsx",
-        "frontend/src/hooks/useLocalAuth.tsx"
+        "frontend/src/hooks/useExperienceNavigationState.ts",
+        "frontend/src/pages/MindVaultLandingPage.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -19,18 +18,17 @@
         "authorization@4.0.0"
       ],
       "testIds": [
-        "REQ-20"
+        "REQ-1"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-implement-secure-credential-handling-for-local-auth-secure-storage-robust-transmission-strict-user-policies-including-password-complexity-and-password-rotation-enforced-simultaneously",
-      "featureTitle": "Implement secure credential handling for local auth: secure storage, robust transmission, strict user policies including password complexity AND password rotation enforced simultaneously.",
+      "featureId": "feature-make-landing-experience-navigation-state-robust-by-keeping-the-ui-state-in-mindvaultlandingpage-in-sync-with-browser-history-state-during-open-close-and-back-navigation-including-repeated-open-close-cycles",
+      "featureTitle": "Make landing/experience navigation state robust by keeping the UI state in MindVaultLandingPage in sync with browser history state during open/close and back navigation (including repeated open/close cycles).",
       "files": [
-        "frontend/src/auth/localAuthCrypto.ts",
-        "frontend/src/components/auth/LocalAuthScreen.tsx",
-        "frontend/src/hooks/useLocalAuth.tsx",
-        "frontend/src/lib/security/passwordPolicy.ts"
+        "frontend/src/components/motion/ZoomPageTransition.tsx",
+        "frontend/src/hooks/useExperienceNavigationState.ts",
+        "frontend/src/pages/MindVaultLandingPage.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -41,17 +39,17 @@
         "authorization@4.0.0"
       ],
       "testIds": [
-        "REQ-21"
+        "REQ-2"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-a-simple-local-captcha-style-challenge-as-an-additional-authentication-layer-during-account-creation-and-or-sign-in-implemented-without-third-party-services",
-      "featureTitle": "Add a simple local CAPTCHA-style challenge as an additional authentication layer during account creation and/or sign-in, implemented without third-party services.",
+      "featureId": "feature-improve-diagnostics-for-this-crash-by-capturing-and-surfacing-the-underlying-runtime-error-details-when-the-errorboundary-is-hit-while-keeping-user-facing-copy-in-english-and-unchanged-in-meaning",
+      "featureTitle": "Improve diagnostics for this crash by capturing and surfacing the underlying runtime error details when the ErrorBoundary is hit (while keeping user-facing copy in English and unchanged in meaning).",
       "files": [
-        "frontend/src/components/auth/LocalAuthScreen.tsx",
-        "frontend/src/components/auth/LocalCaptcha.tsx",
-        "frontend/src/hooks/useLocalAuth.tsx"
+        "frontend/src/components/system/ErrorBoundary.tsx",
+        "frontend/src/pages/MindVaultLandingPage.tsx",
+        "frontend/src/utils/errorBoundaryDiagnostics.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -62,68 +60,7 @@
         "authorization@4.0.0"
       ],
       "testIds": [
-        "REQ-22"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-implement-a-simplified-private-encryption-layer-for-anonymous-chat-such-that-messages-are-end-to-end-encrypted-between-clients-and-also-encrypted-for-storage-transport-on-the-platform-store-ciphertext-not-plaintext",
-      "featureTitle": "Implement a simplified private encryption layer for anonymous chat such that messages are end-to-end encrypted between clients and also encrypted for storage/transport on the platform (store ciphertext, not plaintext).",
-      "files": [
-        "frontend/src/components/experience/AnonymousChat.tsx",
-        "frontend/src/hooks/useLocalAuth.tsx",
-        "frontend/src/lib/crypto/e2ee.ts"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0"
-      ],
-      "testIds": [
-        "REQ-24"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-an-ic-hosted-on-device-rule-based-classifier-that-analyzes-submitted-chat-text-to-identify-mood-and-mental-burnout-signals-and-generate-a-deterministic-rule-based-supportive-response",
-      "featureTitle": "Add an IC-hosted/on-device rule-based classifier that analyzes submitted chat text to identify mood and mental burnout signals, and generate a deterministic, rule-based supportive response.",
-      "files": [
-        "frontend/src/components/experience/AnonymousChat.tsx",
-        "frontend/src/lib/classifier/moodBurnoutRules.ts"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0"
-      ],
-      "testIds": [
-        "REQ-25"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-after-the-system-produces-the-supportive-response-to-the-submitted-chat-text-present-a-dedicated-screen-or-modal-step-that-offers-to-connect-the-user-to-a-licensed-therapist-and-states-that-the-first-session-will-be-free-if-the-user-proceeds",
-      "featureTitle": "After the system produces the supportive response to the submitted chat text, present a dedicated screen (or modal step) that offers to connect the user to a licensed therapist and states that the first session will be free if the user proceeds.",
-      "files": [
-        "frontend/src/components/experience/AnonymousChat.tsx",
-        "frontend/src/components/experience/TherapistPromptModal.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0"
-      ],
-      "testIds": [
-        "REQ-26"
+        "REQ-3"
       ],
       "confidence": "high"
     }

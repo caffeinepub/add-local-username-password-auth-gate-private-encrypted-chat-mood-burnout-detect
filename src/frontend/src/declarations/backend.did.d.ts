@@ -16,10 +16,26 @@ export interface DataEntry {
   'author' : Principal,
   'timestamp' : Time,
 }
+export interface EncryptedMessage {
+  'author' : [] | [Principal],
+  'timestamp' : Time,
+  'encryptedText' : Uint8Array,
+}
 export interface Message {
   'text' : string,
   'author' : Principal,
   'timestamp' : Time,
+}
+export type MoodCategory = { 'stress' : null } |
+  { 'anxiety' : null } |
+  { 'depression' : null } |
+  { 'positive' : null } |
+  { 'neutral' : null };
+export interface SessionRequest {
+  'message' : string,
+  'timestamp' : Time,
+  'category' : MoodCategory,
+  'caller' : Principal,
 }
 export type Time = bigint;
 export interface UserProfile {
@@ -35,18 +51,37 @@ export interface _SERVICE {
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'clearMessages' : ActorMethod<[], undefined>,
   'getAllMessages' : ActorMethod<[], Array<Message>>,
+  'getAllSessionRequests' : ActorMethod<[], Array<SessionRequest>>,
   'getAllUsers' : ActorMethod<[], Array<Principal>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
+  'getMySessionRequests' : ActorMethod<[], Array<SessionRequest>>,
+  'getRecentEncryptedMessages' : ActorMethod<[bigint], Array<EncryptedMessage>>,
   'getRecentMessages' : ActorMethod<[bigint], Array<Message>>,
+  'getSessionRequestsByCategory' : ActorMethod<
+    [MoodCategory],
+    Array<SessionRequest>
+  >,
   'getSystemStats' : ActorMethod<
     [],
     { 'totalEntries' : bigint, 'totalMessages' : bigint, 'totalUsers' : bigint }
   >,
+  'getTemplatesForCategory' : ActorMethod<
+    [MoodCategory],
+    [] | [
+      {
+        'insightTemplates' : Array<string>,
+        'reassuranceTemplates' : Array<string>,
+      }
+    ]
+  >,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
+  'initializeMoodCategoryTemplates' : ActorMethod<[], undefined>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'listEntries' : ActorMethod<[], Array<DataEntry>>,
+  'postEncryptedMessage' : ActorMethod<[Uint8Array], undefined>,
   'postMessage' : ActorMethod<[string], undefined>,
+  'requestSession' : ActorMethod<[MoodCategory, string], undefined>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   'submitEntry' : ActorMethod<[string, string], undefined>,
 }
