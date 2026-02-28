@@ -1,0 +1,59 @@
+{
+  "kind": "coverage_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-26T13:00:14.009Z",
+  "sources": {
+    "buildRequest": true,
+    "implementationPlan": true
+  },
+  "requirements": {
+    "total": 2,
+    "implemented": 2,
+    "items": [
+      {
+        "id": "REQ-1",
+        "summary": "Create a CrisisSupportModal component that displays a prominent, full-screen-overlay popup with a compassionate message reminding the user they are not alone, an offer for a free 30-minute session with a real therapist, and the contact number '90xoxo90xo'. The modal must be freely dismissible by the user via a clearly visible close button.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/experience/CrisisSupportModal.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/experience/CrisisSupportModal.tsx"
+        ]
+      },
+      {
+        "id": "REQ-2",
+        "summary": "Implement keyword detection logic in the frontend that scans user-submitted text (from AnonymousChat.tsx and DataEntryPanel.tsx) for crisis-related phrases indicating suicidal ideation, including but not limited to: 'suicide', 'suicidal', 'end my life', 'kill myself', 'don't want to be here', 'want to die', 'no reason to live', 'better off dead', 'can't go on', 'take my own life'. When any such phrase is detected in a submission, trigger the CrisisSupportModal to display.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/lib/crisisDetection.ts",
+          "frontend/src/components/experience/AnonymousChat.tsx",
+          "frontend/src/components/experience/DataEntryPanel.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/lib/crisisDetection.ts",
+          "frontend/src/components/experience/AnonymousChat.tsx",
+          "frontend/src/components/experience/DataEntryPanel.tsx"
+        ]
+      }
+    ]
+  },
+  "changedFiles": [
+    "build-request.json",
+    "build-template/README.md",
+    "caffeine.lock.json",
+    "feature_evidence.json",
+    "frontend-file-summaries.txt",
+    "frontend-implementation-plan.json",
+    "frontend/src/components/experience/AnonymousChat.tsx",
+    "frontend/src/components/experience/CrisisSupportModal.tsx",
+    "frontend/src/components/experience/DataEntryPanel.tsx",
+    "frontend/src/index.css",
+    "frontend/src/lib/crisisDetection.ts",
+    "frontend/tailwind.config.js",
+    "project_state.json",
+    "scratch/component-selection.json",
+    "spec.md",
+    "spec_vs_diff_report.json"
+  ]
+}

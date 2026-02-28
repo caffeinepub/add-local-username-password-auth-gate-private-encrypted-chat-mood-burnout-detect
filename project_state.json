@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 3,
+  "summary": "A therapist inbox app with mental health features, including crisis support popup with keyword detection for suicidal ideation indicators, displaying a compassionate message and free 30-minute session offer with contact number 90xoxo90xo.",
+  "architectural_notes": [
+    "Crisis popup uses client-side keyword detection on text submissions for suicidal ideation phrases (e.g., 'suicide', 'end my life', 'don't want to be here')"
+  ],
+  "known_issues": [],
+  "isFixRequest": false,
+  "existing_features": [
+    {
+      "id": "feature-create-a-crisissupportmodal-component-that-displays-a-prominent-full-screen-overlay-popup-with-a-compassionate-message-reminding-the-user-they-are-not-alone-an-offer-for-a-free-30-minute-session-with-a-real-therapist-and-the-contact-number-90xoxo90xo-the-modal-must-be-freely-dismissible-by-the-user-via-a-clearly-visible-close-button",
+      "title": "Create a CrisisSupportModal component that displays a prominent, full-screen-overlay popup with a compassionate message reminding the user they are not alone, an offer for a free 30-minute session with a real therapist, and the contact number '90xoxo90xo'. The modal must be freely dismissible by the user via a clearly visible close button.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-keyword-detection-logic-in-the-frontend-that-scans-user-submitted-text-from-anonymouschat-tsx-and-dataentrypanel-tsx-for-crisis-related-phrases-indicating-suicidal-ideation-including-but-not-limited-to-suicide-suicidal-end-my-life-kill-myself-don-t-want-to-be-here-want-to-die-no-reason-to-live-better-off-dead-can-t-go-on-take-my-own-life-when-any-such-phrase-is-detected-in-a-submission-trigger-the-crisissupportmodal-to-display",
+      "title": "Implement keyword detection logic in the frontend that scans user-submitted text (from AnonymousChat.tsx and DataEntryPanel.tsx) for crisis-related phrases indicating suicidal ideation, including but not limited to: 'suicide', 'suicidal', 'end my life', 'kill myself', 'don't want to be here', 'want to die', 'no reason to live', 'better off dead', 'can't go on', 'take my own life'. When any such phrase is detected in a submission, trigger the CrisisSupportModal to display.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Crisis support popup triggered by keyword detection (suicidal ideation phrases) showing compassionate message, free 30-min session offer, and contact number 90xoxo90xo; freely dismissible",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Therapist Inbox App",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

@@ -1,0 +1,45 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-create-a-crisissupportmodal-component-that-displays-a-prominent-full-screen-overlay-popup-with-a-compassionate-message-reminding-the-user-they-are-not-alone-an-offer-for-a-free-30-minute-session-with-a-real-therapist-and-the-contact-number-90xoxo90xo-the-modal-must-be-freely-dismissible-by-the-user-via-a-clearly-visible-close-button",
+      "featureTitle": "Create a CrisisSupportModal component that displays a prominent, full-screen-overlay popup with a compassionate message reminding the user they are not alone, an offer for a free 30-minute session with a real therapist, and the contact number '90xoxo90xo'. The modal must be freely dismissible by the user via a clearly visible close button.",
+      "files": [
+        "frontend/src/components/experience/CrisisSupportModal.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-keyword-detection-logic-in-the-frontend-that-scans-user-submitted-text-from-anonymouschat-tsx-and-dataentrypanel-tsx-for-crisis-related-phrases-indicating-suicidal-ideation-including-but-not-limited-to-suicide-suicidal-end-my-life-kill-myself-don-t-want-to-be-here-want-to-die-no-reason-to-live-better-off-dead-can-t-go-on-take-my-own-life-when-any-such-phrase-is-detected-in-a-submission-trigger-the-crisissupportmodal-to-display",
+      "featureTitle": "Implement keyword detection logic in the frontend that scans user-submitted text (from AnonymousChat.tsx and DataEntryPanel.tsx) for crisis-related phrases indicating suicidal ideation, including but not limited to: 'suicide', 'suicidal', 'end my life', 'kill myself', 'don't want to be here', 'want to die', 'no reason to live', 'better off dead', 'can't go on', 'take my own life'. When any such phrase is detected in a submission, trigger the CrisisSupportModal to display.",
+      "files": [
+        "frontend/src/components/experience/AnonymousChat.tsx",
+        "frontend/src/components/experience/DataEntryPanel.tsx",
+        "frontend/src/lib/crisisDetection.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

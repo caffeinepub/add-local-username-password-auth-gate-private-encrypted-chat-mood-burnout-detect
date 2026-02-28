@@ -1,0 +1,68 @@
+{
+  "kind": "build_request",
+  "title": "Add crisis support popup with keyword detection for suicidal ideation",
+  "projectName": "MindVault",
+  "priority": "high",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Create a CrisisSupportModal component that displays a prominent, full-screen-overlay popup with a compassionate message reminding the user they are not alone, an offer for a free 30-minute session with a real therapist, and the contact number '90xoxo90xo'. The modal must be freely dismissible by the user via a clearly visible close button.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-recent-1",
+          "msg-recent-2"
+        ],
+        "quotes": [
+          "provide a big pop up with the message of they aren't alone and include a free session with a real therapist, of 30 minutes",
+          "displaying a phone number (e.g., a crisis line) - 90xoxo90xo",
+          "the user dismiss it freely"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Modal renders as a prominent overlay with high visual contrast (e.g., warm, supportive color scheme) that draws immediate attention",
+        "Modal displays a compassionate headline such as 'You Are Not Alone' and a supportive body message",
+        "Modal displays an offer for a free 30-minute session with the contact number '90xoxo90xo' clearly visible and easy to read/copy",
+        "Modal includes a visible close/dismiss button that closes it without any forced action",
+        "Modal is accessible with proper ARIA roles (role='dialog', aria-modal='true', aria-labelledby)"
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Implement keyword detection logic in the frontend that scans user-submitted text (from AnonymousChat.tsx and DataEntryPanel.tsx) for crisis-related phrases indicating suicidal ideation, including but not limited to: 'suicide', 'suicidal', 'end my life', 'kill myself', 'don't want to be here', 'want to die', 'no reason to live', 'better off dead', 'can't go on', 'take my own life'. When any such phrase is detected in a submission, trigger the CrisisSupportModal to display.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-recent-1",
+          "msg-recent-2"
+        ],
+        "quotes": [
+          "be based on keyword detection in the user's text submission (e.g., words like 'suicide,' 'end my life,' 'don't want to be here,' etc.)"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A utility function (e.g., detectCrisisKeywords) exists that takes a string and returns true if any crisis phrase is matched (case-insensitive)",
+        "AnonymousChat.tsx calls this detection function on each message submission and shows CrisisSupportModal when true",
+        "DataEntryPanel.tsx calls this detection function on the submitted text values and shows CrisisSupportModal when true",
+        "Detection is case-insensitive and matches partial phrases within a longer sentence",
+        "Crisis modal appears immediately after submission if keywords are detected, before or alongside any other success feedback"
+      ]
+    }
+  ],
+  "constraints": [
+    "Do not modify files under frontend/src/hooks/ (immutable paths)",
+    "Do not modify files under frontend/src/components/ui/ (immutable paths)",
+    "The contact number must be displayed exactly as provided: 90xoxo90xo",
+    "The modal must be freely dismissible — no forced acknowledgement required"
+  ],
+  "nonGoals": [
+    "No backend changes — keyword detection is frontend-only",
+    "No email, SMS, or real-time booking integration",
+    "No logging or reporting of crisis detections to the backend",
+    "No changes to the authentication or subscription flows"
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}
