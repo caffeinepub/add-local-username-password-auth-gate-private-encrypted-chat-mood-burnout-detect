@@ -13,7 +13,6 @@ export default function HeroSection({ onStartAnonymously }: HeroSectionProps) {
   const heroRef = useRef<HTMLElement>(null);
 
   // Direction-aware scroll opacity for background image
-  // Fades out on scroll down, fades in on scroll up
   const bgImageOpacity = useDirectionalScrollOpacity({
     elementRef: heroRef,
     minOpacity: 0.2,
@@ -23,7 +22,6 @@ export default function HeroSection({ onStartAnonymously }: HeroSectionProps) {
 
   useEffect(() => {
     if (prefersReducedMotion || !heroRef.current) return;
-
     const hero = heroRef.current;
     hero.style.setProperty(
       "--gradient-animation",
@@ -47,9 +45,13 @@ export default function HeroSection({ onStartAnonymously }: HeroSectionProps) {
     <section
       ref={heroRef}
       className="relative min-h-screen flex items-center justify-center overflow-hidden px-4 py-20"
+      style={{
+        background:
+          "linear-gradient(135deg, oklch(0.10 0.06 260) 0%, oklch(0.16 0.09 290) 50%, oklch(0.12 0.07 250) 100%)",
+      }}
       aria-label="Hero section"
     >
-      {/* Scroll-fading background image layer with reversed direction */}
+      {/* Scroll-fading background image layer */}
       <div
         className="absolute inset-0 z-0"
         style={{
@@ -62,15 +64,16 @@ export default function HeroSection({ onStartAnonymously }: HeroSectionProps) {
           src="/assets/bg-it.png"
           alt=""
           className="w-full h-full object-cover"
+          style={{ mixBlendMode: "luminosity", opacity: 0.35 }}
         />
       </div>
 
-      {/* Animated gradient background - Light theme */}
+      {/* Animated gradient overlay */}
       <div
-        className="absolute inset-0 opacity-40 z-5"
+        className="absolute inset-0 z-[1]"
         style={{
           background:
-            "linear-gradient(135deg, oklch(98% 0.02 260) 0%, oklch(96% 0.03 280) 50%, oklch(97% 0.02 240) 100%)",
+            "linear-gradient(135deg, oklch(0.10 0.06 260 / 0.7) 0%, oklch(0.16 0.09 290 / 0.6) 50%, oklch(0.12 0.07 250 / 0.7) 100%)",
           backgroundSize: "200% 200%",
           animation: prefersReducedMotion
             ? "none"
@@ -79,29 +82,44 @@ export default function HeroSection({ onStartAnonymously }: HeroSectionProps) {
         aria-hidden="true"
       />
 
-      {/* Background orbs - Reduced opacity for light theme */}
+      {/* Teal glow orb behind heading */}
       <div
-        className="absolute inset-0 pointer-events-none z-10"
+        className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] pointer-events-none z-[2]"
+        style={{
+          background:
+            "radial-gradient(ellipse at center, oklch(0.72 0.2 185 / 0.18) 0%, transparent 70%)",
+          filter: "blur(40px)",
+        }}
         aria-hidden="true"
-      >
-        <img
-          src="/assets/generated/mindvault-orbs.dim_1200x800.png"
-          alt=""
-          className="absolute top-1/4 left-1/4 w-96 h-64 object-contain opacity-10 blur-3xl"
-        />
-      </div>
+      />
 
-      {/* Content with enhanced readability */}
-      <div className="relative z-15 max-w-5xl mx-auto text-center space-y-8 hero-content-readable">
-        <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tight text-foreground mb-6">
+      {/* Content */}
+      <div className="relative z-[15] max-w-5xl mx-auto text-center space-y-8">
+        <h1
+          className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tight mb-6"
+          style={{
+            background:
+              "linear-gradient(135deg, oklch(0.65 0.28 255) 0%, oklch(0.68 0.28 290) 50%, oklch(0.68 0.22 28) 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+            textShadow: "none",
+          }}
+        >
           MINDVAULT
         </h1>
 
-        <h2 className="hero-headline text-foreground">
+        <h2
+          className="text-2xl md:text-3xl font-semibold"
+          style={{ color: "oklch(0.95 0.02 240)" }}
+        >
           Your mind deserves care too
         </h2>
 
-        <p className="hero-subtext text-muted-foreground max-w-2xl mx-auto">
+        <p
+          className="text-lg max-w-2xl mx-auto"
+          style={{ color: "oklch(0.80 0.05 270)" }}
+        >
           Anonymous AI support that listens, understands, and connects you to
           real help.
         </p>
@@ -119,7 +137,7 @@ export default function HeroSection({ onStartAnonymously }: HeroSectionProps) {
         </div>
       </div>
 
-      {/* Neural particles overlay - Now above content with subtle blend */}
+      {/* Neural particles overlay */}
       <NeuralParticlesOverlay />
     </section>
   );

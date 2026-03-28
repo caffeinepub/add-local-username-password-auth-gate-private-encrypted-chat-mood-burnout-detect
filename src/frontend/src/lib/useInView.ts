@@ -24,11 +24,8 @@ export function useInView(options: UseInViewOptions = {}) {
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsInView(true);
-          // Once in view, stop observing
-          observer.unobserve(element);
-        }
+        // Bidirectional: update state on every intersection change
+        setIsInView(entry.isIntersecting);
       },
       { threshold, rootMargin },
     );

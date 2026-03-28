@@ -8,6 +8,13 @@ interface ZoomInViewProps {
   className?: string;
   threshold?: number;
   rootMargin?: string;
+  direction?: "left" | "right" | "up";
+}
+
+function getInitialTransform(direction: "left" | "right" | "up"): string {
+  if (direction === "left") return "translateX(-60px)";
+  if (direction === "right") return "translateX(60px)";
+  return "translateY(40px)";
 }
 
 export default function ZoomInView({
@@ -15,6 +22,7 @@ export default function ZoomInView({
   className = "",
   threshold = 0.1,
   rootMargin = "0px 0px -100px 0px",
+  direction = "up",
 }: ZoomInViewProps) {
   const { ref, isInView } = useInView({ threshold, rootMargin });
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -34,8 +42,8 @@ export default function ZoomInView({
       style={{
         opacity: isInView ? 1 : 0,
         transform: isInView
-          ? "scale(1)"
-          : `scale(${ZOOM_CONFIG.component.scaleFrom})`,
+          ? "translate(0, 0)"
+          : getInitialTransform(direction),
         transition: `opacity ${ZOOM_CONFIG.component.duration}ms ${ZOOM_CONFIG.component.easing}, transform ${ZOOM_CONFIG.component.duration}ms ${ZOOM_CONFIG.component.easing}`,
       }}
     >

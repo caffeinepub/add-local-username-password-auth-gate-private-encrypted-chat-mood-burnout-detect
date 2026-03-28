@@ -26,7 +26,15 @@ export default function PrivacyTrustSection() {
   const prefersReducedMotion = usePrefersReducedMotion();
 
   return (
-    <section id="privacy-section" ref={ref} className="py-24 px-4 bg-muted/30">
+    <section
+      id="privacy-section"
+      ref={ref}
+      className="py-24 px-4"
+      style={{
+        background:
+          "linear-gradient(135deg, oklch(0.12 0.07 185) 0%, oklch(0.14 0.06 230) 50%, oklch(0.13 0.06 260) 100%)",
+      }}
+    >
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Text content */}
@@ -39,13 +47,22 @@ export default function PrivacyTrustSection() {
                 : "opacity 0.8s ease-out, transform 0.8s ease-out",
             }}
           >
-            <p className="text-accent font-semibold mb-2 uppercase tracking-wide text-sm">
+            <p
+              className="font-semibold mb-2 uppercase tracking-wide text-sm"
+              style={{ color: "oklch(0.72 0.2 185)" }}
+            >
               Privacy & Trust
             </p>
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+            <h2
+              className="text-4xl md:text-5xl font-bold mb-6"
+              style={{ color: "oklch(0.97 0.005 240)" }}
+            >
               Your Privacy is Our Priority
             </h2>
-            <p className="text-lg text-muted-foreground mb-8">
+            <p
+              className="text-lg mb-8"
+              style={{ color: "oklch(0.80 0.05 200)" }}
+            >
               We understand that mental health is deeply personal. That's why
               we've built MindVault with privacy and security at its core.
             </p>
@@ -69,10 +86,18 @@ export default function PrivacyTrustSection() {
                         : `opacity 0.6s ease-out ${delay + 200}ms, transform 0.6s ease-out ${delay + 200}ms`,
                     }}
                   >
-                    <div className="shrink-0 w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center mt-0.5">
-                      <Icon className="w-4 h-4 text-accent" />
+                    <div
+                      className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center mt-0.5"
+                      style={{ background: "oklch(0.70 0.2 155 / 0.2)" }}
+                    >
+                      <Icon
+                        className="w-4 h-4"
+                        style={{ color: "oklch(0.70 0.2 155)" }}
+                      />
                     </div>
-                    <span className="text-foreground">{commitment.text}</span>
+                    <span style={{ color: "oklch(0.92 0.03 200)" }}>
+                      {commitment.text}
+                    </span>
                   </li>
                 );
               })}

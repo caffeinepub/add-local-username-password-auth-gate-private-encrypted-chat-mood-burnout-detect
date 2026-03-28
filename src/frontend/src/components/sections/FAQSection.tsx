@@ -45,7 +45,15 @@ export default function FAQSection() {
   const prefersReducedMotion = usePrefersReducedMotion();
 
   return (
-    <section id="faq-section" ref={ref} className="py-24 px-4 bg-background">
+    <section
+      id="faq-section"
+      ref={ref}
+      className="py-24 px-4"
+      style={{
+        background:
+          "linear-gradient(135deg, oklch(0.13 0.05 45) 0%, oklch(0.11 0.04 260) 60%, oklch(0.12 0.04 260) 100%)",
+      }}
+    >
       <div className="max-w-4xl mx-auto">
         <div
           className="text-center mb-12"
@@ -57,13 +65,25 @@ export default function FAQSection() {
               : "opacity 0.6s ease-out, transform 0.6s ease-out",
           }}
         >
-          <p className="text-accent font-semibold mb-2 uppercase tracking-wide text-sm">
+          <p
+            className="font-semibold mb-2 uppercase tracking-wide text-sm"
+            style={{ color: "oklch(0.78 0.18 70)" }}
+          >
             FAQ
           </p>
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+          <h2
+            className="text-4xl md:text-5xl font-bold mb-4"
+            style={{
+              background:
+                "linear-gradient(135deg, oklch(0.78 0.18 70), oklch(0.68 0.22 28))",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}
+          >
             Frequently Asked Questions
           </h2>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-lg" style={{ color: "oklch(0.75 0.06 270)" }}>
             Everything you need to know about MindVault
           </p>
         </div>
@@ -82,12 +102,20 @@ export default function FAQSection() {
               <AccordionItem
                 key={faq.question}
                 value={`item-${index}`}
-                className="border border-border/50 rounded-lg px-6 bg-card/50 backdrop-blur-sm"
+                className="rounded-lg px-6"
+                style={{
+                  background: "oklch(0.17 0.05 260 / 0.8)",
+                  border: "1px solid oklch(0.28 0.06 260)",
+                  backdropFilter: "blur(8px)",
+                }}
               >
-                <AccordionTrigger className="text-left text-foreground hover:text-accent transition-colors">
+                <AccordionTrigger
+                  className="text-left transition-colors"
+                  style={{ color: "oklch(0.95 0.01 240)" }}
+                >
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground">
+                <AccordionContent style={{ color: "oklch(0.80 0.05 270)" }}>
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>

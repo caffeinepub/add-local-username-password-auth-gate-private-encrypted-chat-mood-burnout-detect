@@ -41,6 +41,7 @@ export default function ZoomPageTransition({
 
   const getViewStyle = (view: "landing" | "experience") => {
     const isActive = currentView === view;
+    // Is this view the one we're navigating TO?
     const isTarget = showExperience
       ? view === "experience"
       : view === "landing";
@@ -54,13 +55,18 @@ export default function ZoomPageTransition({
       };
     }
 
-    // Zoom out when leaving, zoom in when entering
     let scale = 1;
     let opacity = 1;
 
     if (!isActive) {
       opacity = 0;
-      scale = isTarget ? ZOOM_CONFIG.page.scaleFrom : 1.05; // Zoom out when leaving, zoom in when entering
+      if (isTarget) {
+        // Incoming page: starts slightly zoomed in, springs to 1
+        scale = ZOOM_CONFIG.page.scaleEnter;
+      } else {
+        // Outgoing page: zooms out to 0.85
+        scale = ZOOM_CONFIG.page.scaleFrom;
+      }
     }
 
     return {

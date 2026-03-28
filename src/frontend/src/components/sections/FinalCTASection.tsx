@@ -20,14 +20,18 @@ export default function FinalCTASection({
       className={`relative py-32 px-4 overflow-hidden transition-all duration-700 ${
         isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
       }`}
+      style={{
+        background:
+          "linear-gradient(135deg, oklch(0.18 0.12 320) 0%, oklch(0.14 0.10 290) 50%, oklch(0.16 0.10 310) 100%)",
+      }}
       aria-label="Final call to action"
     >
-      {/* Gradient emphasis background */}
+      {/* Pulse glow */}
       <div
         className="absolute inset-0 opacity-30"
         style={{
           background:
-            "radial-gradient(circle at center, rgba(34, 211, 238, 0.15) 0%, transparent 70%)",
+            "radial-gradient(circle at center, oklch(0.68 0.22 28 / 0.25) 0%, oklch(0.65 0.28 335 / 0.15) 40%, transparent 70%)",
           animation: prefersReducedMotion
             ? "none"
             : "pulse-glow 4s ease-in-out infinite",
@@ -36,7 +40,10 @@ export default function FinalCTASection({
       />
 
       <div className="relative z-10 max-w-4xl mx-auto text-center space-y-8">
-        <h2 className="section-headline text-foreground">
+        <h2
+          className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight"
+          style={{ color: "oklch(0.97 0.005 240)" }}
+        >
           You don't need to reach a breaking point to ask for help.
         </h2>
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import ExperienceView from "../components/experience/ExperienceView";
 import Footer from "../components/layout/Footer";
+import StickyNav from "../components/layout/StickyNav";
 import ZoomInView from "../components/motion/ZoomInView";
 import ZoomPageTransition from "../components/motion/ZoomPageTransition";
 import AboutSection from "../components/sections/AboutSection";
@@ -22,14 +23,12 @@ export default function MindVaultLandingPage() {
   const handleOpenExperience = () => {
     setCurrentView("experience");
     window.scrollTo({ top: 0, behavior: "smooth" });
-    // Push a history state so browser back works
     window.history.pushState({ view: "experience" }, "", window.location.href);
   };
 
   const handleOpenSubscriptionPlans = () => {
     setCurrentView("subscription-plans");
     window.scrollTo({ top: 0, behavior: "smooth" });
-    // Push a history state so browser back works
     window.history.pushState(
       { view: "subscription-plans" },
       "",
@@ -42,7 +41,6 @@ export default function MindVaultLandingPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Listen for browser back button
   useEffect(() => {
     const handlePopState = (_event: PopStateEvent) => {
       if (currentView !== "landing") {
@@ -57,7 +55,6 @@ export default function MindVaultLandingPage() {
 
   const landingContent = (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Skip to content link for accessibility */}
       <a
         href="#main-content"
         className="skip-link sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
@@ -65,40 +62,42 @@ export default function MindVaultLandingPage() {
         Skip to main content
       </a>
 
+      <StickyNav />
+
       <main id="main-content" className="relative">
-        <ZoomInView>
+        <ZoomInView direction="up">
           <HeroSection onStartAnonymously={handleOpenExperience} />
         </ZoomInView>
 
-        <ZoomInView>
+        <ZoomInView direction="left">
           <CoreEmotionalQuestionSection />
         </ZoomInView>
 
-        <ZoomInView>
+        <ZoomInView direction="right">
           <HowItWorksSection />
         </ZoomInView>
 
-        <ZoomInView>
+        <ZoomInView direction="left">
           <FeaturesGridSection />
         </ZoomInView>
 
-        <ZoomInView>
+        <ZoomInView direction="right">
           <AboutSection />
         </ZoomInView>
 
-        <ZoomInView>
+        <ZoomInView direction="left">
           <CorporateBurnoutInsightSection />
         </ZoomInView>
 
-        <ZoomInView>
+        <ZoomInView direction="right">
           <PrivacyTrustSection />
         </ZoomInView>
 
-        <ZoomInView>
+        <ZoomInView direction="left">
           <FAQSection />
         </ZoomInView>
 
-        <ZoomInView>
+        <ZoomInView direction="up">
           <FinalCTASection
             onStartMindVault={handleOpenExperience}
             onSubscriptionPlans={handleOpenSubscriptionPlans}
@@ -116,7 +115,6 @@ export default function MindVaultLandingPage() {
     <SubscriptionPlansPage onGoBack={handleBackToLanding} />
   );
 
-  // Render based on current view
   if (currentView === "subscription-plans") {
     return subscriptionPlansContent;
   }

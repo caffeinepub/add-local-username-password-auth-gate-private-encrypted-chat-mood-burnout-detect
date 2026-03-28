@@ -7,17 +7,24 @@ export interface GlassCardProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
-  ({ className, ...props }, ref) => {
+  ({ className, style, ...props }, ref) => {
     const transitionStyle = `transition-all ${getZoomTransition("component")}`;
 
     return (
       <div
         ref={ref}
         className={cn(
-          "glass-card hover:scale-[1.02] hover:shadow-lg focus-within:scale-[1.02] focus-within:shadow-lg",
+          "hover:scale-[1.02] hover:shadow-lg focus-within:scale-[1.02] focus-within:shadow-lg rounded-xl",
           transitionStyle,
           className,
         )}
+        style={{
+          background: "oklch(0.17 0.05 260 / 0.85)",
+          border: "1px solid oklch(0.28 0.06 260)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          ...style,
+        }}
         {...props}
       />
     );
