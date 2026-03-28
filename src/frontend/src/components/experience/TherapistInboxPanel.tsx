@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Loader2, Inbox, Calendar, User, MessageSquare } from 'lucide-react';
-import { useGetAllSessionRequests } from '@/hooks/useQueries';
-import { getCategoryLabel, getCategoryColor } from '@/lib/moodPresets';
-import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useGetAllSessionRequests } from "@/hooks/useQueries";
+import { getCategoryColor, getCategoryLabel } from "@/lib/moodPresets";
+import { cn } from "@/lib/utils";
+import { Calendar, Inbox, Loader2, MessageSquare, User } from "lucide-react";
+import { useState } from "react";
 
 export default function TherapistInboxPanel() {
   const { data: requests = [], isLoading, error } = useGetAllSessionRequests();
@@ -12,11 +12,11 @@ export default function TherapistInboxPanel() {
   const formatTimestamp = (timestamp: bigint) => {
     const date = new Date(Number(timestamp) / 1000000);
     return date.toLocaleString([], {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -29,10 +29,12 @@ export default function TherapistInboxPanel() {
     <div className="flex flex-col h-full space-y-4">
       <div className="flex items-center gap-2 pb-2 border-b border-border/50">
         <Inbox className="w-5 h-5 text-accent" />
-        <h3 className="text-lg font-semibold text-foreground">Therapist Inbox</h3>
+        <h3 className="text-lg font-semibold text-foreground">
+          Therapist Inbox
+        </h3>
         {!isLoading && (
           <Badge variant="secondary" className="ml-auto">
-            {requests.length} {requests.length === 1 ? 'request' : 'requests'}
+            {requests.length} {requests.length === 1 ? "request" : "requests"}
           </Badge>
         )}
       </div>
@@ -46,7 +48,9 @@ export default function TherapistInboxPanel() {
 
         {error && (
           <div className="flex items-center justify-center h-full">
-            <p className="text-destructive text-sm">Failed to load session requests. Please try again.</p>
+            <p className="text-destructive text-sm">
+              Failed to load session requests. Please try again.
+            </p>
           </div>
         )}
 
@@ -71,7 +75,10 @@ export default function TherapistInboxPanel() {
                   <div className="flex items-center gap-2">
                     <Badge
                       variant="outline"
-                      className={cn('font-medium', getCategoryColor(request.category))}
+                      className={cn(
+                        "font-medium",
+                        getCategoryColor(request.category),
+                      )}
                     >
                       {getCategoryLabel(request.category)}
                     </Badge>

@@ -1,53 +1,58 @@
-import { useState, useEffect } from 'react';
-import HeroSection from '../components/sections/HeroSection';
-import CoreEmotionalQuestionSection from '../components/sections/CoreEmotionalQuestionSection';
-import HowItWorksSection from '../components/sections/HowItWorksSection';
-import FeaturesGridSection from '../components/sections/FeaturesGridSection';
-import CorporateBurnoutInsightSection from '../components/sections/CorporateBurnoutInsightSection';
-import PrivacyTrustSection from '../components/sections/PrivacyTrustSection';
-import FAQSection from '../components/sections/FAQSection';
-import FinalCTASection from '../components/sections/FinalCTASection';
-import Footer from '../components/layout/Footer';
-import ExperienceView from '../components/experience/ExperienceView';
-import SubscriptionPlansPage from './SubscriptionPlansPage';
-import ZoomPageTransition from '../components/motion/ZoomPageTransition';
-import ZoomInView from '../components/motion/ZoomInView';
+import { useEffect, useState } from "react";
+import ExperienceView from "../components/experience/ExperienceView";
+import Footer from "../components/layout/Footer";
+import ZoomInView from "../components/motion/ZoomInView";
+import ZoomPageTransition from "../components/motion/ZoomPageTransition";
+import AboutSection from "../components/sections/AboutSection";
+import CoreEmotionalQuestionSection from "../components/sections/CoreEmotionalQuestionSection";
+import CorporateBurnoutInsightSection from "../components/sections/CorporateBurnoutInsightSection";
+import FAQSection from "../components/sections/FAQSection";
+import FeaturesGridSection from "../components/sections/FeaturesGridSection";
+import FinalCTASection from "../components/sections/FinalCTASection";
+import HeroSection from "../components/sections/HeroSection";
+import HowItWorksSection from "../components/sections/HowItWorksSection";
+import PrivacyTrustSection from "../components/sections/PrivacyTrustSection";
+import SubscriptionPlansPage from "./SubscriptionPlansPage";
 
-type ViewState = 'landing' | 'experience' | 'subscription-plans';
+type ViewState = "landing" | "experience" | "subscription-plans";
 
 export default function MindVaultLandingPage() {
-  const [currentView, setCurrentView] = useState<ViewState>('landing');
+  const [currentView, setCurrentView] = useState<ViewState>("landing");
 
   const handleOpenExperience = () => {
-    setCurrentView('experience');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setCurrentView("experience");
+    window.scrollTo({ top: 0, behavior: "smooth" });
     // Push a history state so browser back works
-    window.history.pushState({ view: 'experience' }, '', window.location.href);
+    window.history.pushState({ view: "experience" }, "", window.location.href);
   };
 
   const handleOpenSubscriptionPlans = () => {
-    setCurrentView('subscription-plans');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setCurrentView("subscription-plans");
+    window.scrollTo({ top: 0, behavior: "smooth" });
     // Push a history state so browser back works
-    window.history.pushState({ view: 'subscription-plans' }, '', window.location.href);
+    window.history.pushState(
+      { view: "subscription-plans" },
+      "",
+      window.location.href,
+    );
   };
 
   const handleBackToLanding = () => {
-    setCurrentView('landing');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setCurrentView("landing");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   // Listen for browser back button
   useEffect(() => {
-    const handlePopState = (event: PopStateEvent) => {
-      if (currentView !== 'landing') {
-        setCurrentView('landing');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+    const handlePopState = (_event: PopStateEvent) => {
+      if (currentView !== "landing") {
+        setCurrentView("landing");
+        window.scrollTo({ top: 0, behavior: "smooth" });
       }
     };
 
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
   }, [currentView]);
 
   const landingContent = (
@@ -64,33 +69,37 @@ export default function MindVaultLandingPage() {
         <ZoomInView>
           <HeroSection onStartAnonymously={handleOpenExperience} />
         </ZoomInView>
-        
+
         <ZoomInView>
           <CoreEmotionalQuestionSection />
         </ZoomInView>
-        
+
         <ZoomInView>
           <HowItWorksSection />
         </ZoomInView>
-        
+
         <ZoomInView>
           <FeaturesGridSection />
         </ZoomInView>
-        
+
+        <ZoomInView>
+          <AboutSection />
+        </ZoomInView>
+
         <ZoomInView>
           <CorporateBurnoutInsightSection />
         </ZoomInView>
-        
+
         <ZoomInView>
           <PrivacyTrustSection />
         </ZoomInView>
-        
+
         <ZoomInView>
           <FAQSection />
         </ZoomInView>
-        
+
         <ZoomInView>
-          <FinalCTASection 
+          <FinalCTASection
             onStartMindVault={handleOpenExperience}
             onSubscriptionPlans={handleOpenSubscriptionPlans}
           />
@@ -101,22 +110,20 @@ export default function MindVaultLandingPage() {
     </div>
   );
 
-  const experienceContent = (
-    <ExperienceView onClose={handleBackToLanding} />
-  );
+  const experienceContent = <ExperienceView onClose={handleBackToLanding} />;
 
   const subscriptionPlansContent = (
     <SubscriptionPlansPage onGoBack={handleBackToLanding} />
   );
 
   // Render based on current view
-  if (currentView === 'subscription-plans') {
+  if (currentView === "subscription-plans") {
     return subscriptionPlansContent;
   }
 
   return (
     <ZoomPageTransition
-      showExperience={currentView === 'experience'}
+      showExperience={currentView === "experience"}
       landingContent={landingContent}
       experienceContent={experienceContent}
     />

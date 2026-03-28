@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { usePrefersReducedMotion } from './usePrefersReducedMotion';
+import { useEffect, useRef, useState } from "react";
+import { usePrefersReducedMotion } from "./usePrefersReducedMotion";
 
 interface UseInViewOptions {
   threshold?: number;
@@ -7,7 +7,7 @@ interface UseInViewOptions {
 }
 
 export function useInView(options: UseInViewOptions = {}) {
-  const { threshold = 0.1, rootMargin = '0px' } = options;
+  const { threshold = 0.1, rootMargin = "0px" } = options;
   const ref = useRef<HTMLElement>(null);
   const [isInView, setIsInView] = useState(false);
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -30,7 +30,7 @@ export function useInView(options: UseInViewOptions = {}) {
           observer.unobserve(element);
         }
       },
-      { threshold, rootMargin }
+      { threshold, rootMargin },
     );
 
     observer.observe(element);

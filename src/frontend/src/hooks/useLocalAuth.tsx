@@ -1,8 +1,21 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { localAuthStore, type LocalAccount } from '../auth/localAuthStore';
-import { validatePasswordComplexity, isPasswordRotationRequired } from '../lib/security/passwordPolicy';
-import { derivePasswordVerifier, verifyPassword, generateEncryptionKey } from '../auth/localAuthCrypto';
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  type ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import {
+  derivePasswordVerifier,
+  generateEncryptionKey,
+  verifyPassword,
+} from "../auth/localAuthCrypto";
+import { type LocalAccount, localAuthStore } from "../auth/localAuthStore";
+import {
+  isPasswordRotationRequired,
+  validatePasswordComplexity,
+} from "../lib/security/passwordPolicy";
 
 interface LocalAuthContextValue {
   isAuthenticated: boolean;
@@ -20,11 +33,13 @@ const LocalAuthContext = createContext<LocalAuthContextValue | null>(null);
 
 export function LocalAuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [currentAccount, setCurrentAccount] = useState<LocalAccount | null>(null);
+  const [currentAccount, setCurrentAccount] = useState<LocalAccount | null>(
+    null,
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [encryptionKey, setEncryptionKey] = useState<CryptoKey | null>(null);
-  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [_failedAttempts, setFailedAttempts] = useState(0);
   const queryClient = useQueryClient();
 
   // Check for existing session on mount
@@ -44,7 +59,7 @@ export function LocalAuthProvider({ children }: { children: ReactNode }) {
           }
         }
       } catch (err) {
-        console.error('Session check failed:', err);
+        console.error("Session check failed:", err);
         await localAuthStore.clearSession();
       } finally {
         setIsLoading(false);
@@ -61,23 +76,26 @@ export function LocalAuthProvider({ children }: { children: ReactNode }) {
     try {
       // Validate username
       if (!username.trim() || username.length < 3) {
-        throw new Error('Username must be at least 3 characters long');
+        throw new Error("Username must be at least 3 characters long");
       }
 
       // Check if account exists
       const existingAccount = await localAuthStore.getAccount(username);
       if (existingAccount) {
-        throw new Error('Username already exists');
+        throw new Error("Username already exists");
       }
 
       // Validate password complexity
       const complexityResult = validatePasswordComplexity(password);
       if (!complexityResult.isValid) {
-        throw new Error(complexityResult.errors.join('. '));
+        throw new Error(complexityResult.errors.join(". "));
       }
 
       // Create password verifier (returns hex strings)
-      const { salt, verifier } = await derivePasswordVerifier(username, password);
+      const { salt, verifier } = await derivePasswordVerifier(
+        username,
+        password,
+      );
 
       // Generate fresh encryption key for this session
       const sessionKey = await generateEncryptionKey();
@@ -99,7 +117,7 @@ export function LocalAuthProvider({ children }: { children: ReactNode }) {
       setEncryptionKey(sessionKey);
       setFailedAttempts(0);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Sign up failed');
+      setError(err instanceof Error ? err.message : "Sign up failed");
       throw err;
     } finally {
       setIsLoading(false);
@@ -114,20 +132,26 @@ export function LocalAuthProvider({ children }: { children: ReactNode }) {
       // Get account
       const account = await localAuthStore.getAccount(username);
       if (!account) {
-        setFailedAttempts(prev => prev + 1);
-        throw new Error('Invalid username or password');
+        setFailedAttempts((prev) => prev + 1);
+        throw new Error("Invalid username or password");
       }
 
       // Verify password (account.salt and account.verifier are hex strings)
-      const isValid = await verifyPassword(password, account.salt, account.verifier);
+      const isValid = await verifyPassword(
+        password,
+        account.salt,
+        account.verifier,
+      );
       if (!isValid) {
-        setFailedAttempts(prev => prev + 1);
-        throw new Error('Invalid username or password');
+        setFailedAttempts((prev) => prev + 1);
+        throw new Error("Invalid username or password");
       }
 
       // Check password rotation
       if (isPasswordRotationRequired(account.lastPasswordChange)) {
-        throw new Error('Password rotation required. Please update your password.');
+        throw new Error(
+          "Password rotation required. Please update your password.",
+        );
       }
 
       // Generate fresh encryption key for this session
@@ -141,7 +165,7 @@ export function LocalAuthProvider({ children }: { children: ReactNode }) {
       setEncryptionKey(sessionKey);
       setFailedAttempts(0);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Sign in failed');
+      setError(err instanceof Error ? err.message : "Sign in failed");
       throw err;
     } finally {
       setIsLoading(false);
@@ -158,7 +182,7 @@ export function LocalAuthProvider({ children }: { children: ReactNode }) {
       setFailedAttempts(0);
       queryClient.clear();
     } catch (err) {
-      console.error('Sign out failed:', err);
+      console.error("Sign out failed:", err);
     } finally {
       setIsLoading(false);
     }
@@ -188,7 +212,7 @@ export function LocalAuthProvider({ children }: { children: ReactNode }) {
 export function useLocalAuth() {
   const context = useContext(LocalAuthContext);
   if (!context) {
-    throw new Error('useLocalAuth must be used within LocalAuthProvider');
+    throw new Error("useLocalAuth must be used within LocalAuthProvider");
   }
   return context;
 }

@@ -1,34 +1,38 @@
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { RefreshCw } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RefreshCw } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 
 interface LocalCaptchaProps {
   onVerify: (isValid: boolean) => void;
   regenerateTrigger?: number;
 }
 
-export default function LocalCaptcha({ onVerify, regenerateTrigger = 0 }: LocalCaptchaProps) {
+export default function LocalCaptcha({
+  onVerify,
+  regenerateTrigger: _regenerateTrigger = 0,
+}: LocalCaptchaProps) {
   const [challenge, setChallenge] = useState({ num1: 0, num2: 0, answer: 0 });
-  const [userAnswer, setUserAnswer] = useState('');
+  const [userAnswer, setUserAnswer] = useState("");
   const [isVerified, setIsVerified] = useState(false);
 
-  const generateChallenge = () => {
+  const generateChallenge = useCallback(() => {
     const num1 = Math.floor(Math.random() * 20) + 1;
     const num2 = Math.floor(Math.random() * 20) + 1;
     setChallenge({ num1, num2, answer: num1 + num2 });
-    setUserAnswer('');
+    setUserAnswer("");
     setIsVerified(false);
     onVerify(false);
-  };
+  }, [onVerify]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: _regenerateTrigger is an intentional trigger prop
   useEffect(() => {
     generateChallenge();
-  }, [regenerateTrigger]);
+  }, [generateChallenge, _regenerateTrigger]);
 
   const handleVerify = () => {
-    const isValid = parseInt(userAnswer) === challenge.answer;
+    const isValid = Number.parseInt(userAnswer) === challenge.answer;
     setIsVerified(isValid);
     onVerify(isValid);
   };
@@ -76,9 +80,9 @@ export default function LocalCaptcha({ onVerify, regenerateTrigger = 0 }: LocalC
           type="button"
           onClick={handleVerify}
           disabled={!userAnswer}
-          variant={isVerified ? 'default' : 'outline'}
+          variant={isVerified ? "default" : "outline"}
         >
-          {isVerified ? 'Verified ✓' : 'Verify'}
+          {isVerified ? "Verified ✓" : "Verify"}
         </Button>
       </div>
     </div>

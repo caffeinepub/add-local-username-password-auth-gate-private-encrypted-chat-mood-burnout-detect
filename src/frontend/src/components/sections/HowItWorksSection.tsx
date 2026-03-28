@@ -1,104 +1,103 @@
-import { useState } from 'react';
-import { Shield, Brain, Users } from 'lucide-react';
-import { useInView } from '../../lib/useInView';
-import Section from '../primitives/Section';
-import ProgressIndicator from '../primitives/ProgressIndicator';
-import ConversationPreview from '../primitives/ConversationPreview';
-import { usePrefersReducedMotion } from '../../lib/usePrefersReducedMotion';
+import { useInView } from "@/lib/useInView";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
+import { Brain, MessageSquare, UserCheck } from "lucide-react";
+import ConversationPreview from "../primitives/ConversationPreview";
+import ProgressIndicator from "../primitives/ProgressIndicator";
 
 const steps = [
   {
-    id: 1,
-    icon: Shield,
-    title: 'Anonymous Entry',
-    description: 'Share what is on your mind without revealing who you are. No accounts, no tracking, no judgment.',
-    preview: {
-      user: "I have been feeling overwhelmed at work lately...",
-      ai: "I hear you. It sounds like you are carrying a lot right now. Would you like to tell me more about what has been happening?"
-    }
+    icon: MessageSquare,
+    title: "Share Your Thoughts",
+    description:
+      "Express yourself freely in a secure, encrypted space. No judgment, just support.",
   },
   {
-    id: 2,
     icon: Brain,
-    title: 'AI Emotional Triage',
-    description: 'Our AI companion listens and understands the emotional weight of what you are experiencing.',
-    preview: {
-      user: "I cannot sleep, and I feel anxious all the time.",
-      ai: "Those feelings are valid. Let us explore what might be contributing to this together. Have you noticed any patterns or triggers?"
-    }
+    title: "AI Analysis",
+    description:
+      "Our AI analyzes patterns and provides immediate insights and reassurance.",
   },
   {
-    id: 3,
-    icon: Users,
-    title: 'AI Support or Therapist Connection',
-    description: 'Get immediate AI-guided support tools, or connect with a licensed therapist when you are ready.',
-    preview: {
-      user: "I think I need to talk to someone professional.",
-      ai: "That is a courageous step. I can connect you with a licensed therapist who specializes in what you are experiencing. Would you like to see available options?"
-    }
-  }
+    icon: UserCheck,
+    title: "Professional Support",
+    description:
+      "Connect with licensed therapists when you need human guidance.",
+  },
 ];
 
 export default function HowItWorksSection() {
   const { ref, isInView } = useInView({ threshold: 0.2 });
-  const [activeStep, setActiveStep] = useState<number | null>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
 
   return (
-    <Section
-      id="how-it-works"
+    <section
+      id="how-it-works-section"
       ref={ref}
-      eyebrow="How MindVault Works"
-      title="Three steps to support"
-      description="A gentle path from anonymity to care"
-      aria-label="How MindVault works"
+      className="py-24 px-4 bg-muted/30"
     >
-      <ProgressIndicator currentStep={activeStep || 1} totalSteps={3} />
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-16">
+          <p className="text-accent font-semibold mb-2 uppercase tracking-wide text-sm">
+            How It Works
+          </p>
+          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+            Three Simple Steps to Better Mental Health
+          </h2>
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+            MindVault makes it easy to get the support you need, when you need
+            it.
+          </p>
+        </div>
 
-      <div className="grid md:grid-cols-3 gap-8 mt-12">
-        {steps.map((step, index) => {
-          const Icon = step.icon;
-          const delay = prefersReducedMotion ? 0 : index * 150;
-          
-          return (
-            <div
-              key={step.id}
-              className={`transition-all duration-500 ${
-                isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-              }`}
-              style={{ transitionDelay: `${delay}ms` }}
-              onMouseEnter={() => setActiveStep(step.id)}
-              onMouseLeave={() => setActiveStep(null)}
-              onFocus={() => setActiveStep(step.id)}
-              onBlur={() => setActiveStep(null)}
-              tabIndex={0}
-              role="article"
-              aria-label={`Step ${step.id}: ${step.title}`}
-            >
-              <div className="glass-card p-8 h-full space-y-4 cursor-pointer">
-                <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-accent/20 text-accent mx-auto">
-                  <Icon className="w-8 h-8" aria-hidden="true" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Steps */}
+          <div className="space-y-8">
+            <ProgressIndicator currentStep={1} totalSteps={3} />
+
+            {steps.map((step, index) => {
+              const Icon = step.icon;
+              const delay = prefersReducedMotion ? 0 : index * 150;
+
+              return (
+                <div
+                  key={step.title}
+                  className="flex items-start gap-4 group"
+                  style={{
+                    opacity: isInView ? 1 : 0,
+                    transform: isInView ? "translateX(0)" : "translateX(-20px)",
+                    transition: prefersReducedMotion
+                      ? "none"
+                      : `opacity 0.6s ease-out ${delay}ms, transform 0.6s ease-out ${delay}ms`,
+                  }}
+                >
+                  <div className="shrink-0 w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
+                    <Icon className="w-6 h-6 text-accent" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-foreground mb-2">
+                      {index + 1}. {step.title}
+                    </h3>
+                    <p className="text-muted-foreground">{step.description}</p>
+                  </div>
                 </div>
-                
-                <h3 className="text-xl font-semibold text-foreground text-center">
-                  {step.title}
-                </h3>
-                
-                <p className="text-muted-foreground text-center leading-relaxed">
-                  {step.description}
-                </p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+              );
+            })}
+          </div>
 
-      {/* Conversation preview */}
-      {activeStep && (
-        <ConversationPreview
-          preview={steps.find(s => s.id === activeStep)?.preview}
-        />
-      )}
-    </Section>
+          {/* Conversation preview */}
+          <div
+            style={{
+              opacity: isInView ? 1 : 0,
+              transform: isInView ? "translateX(0)" : "translateX(20px)",
+              transition: prefersReducedMotion
+                ? "none"
+                : "opacity 0.8s ease-out 300ms, transform 0.8s ease-out 300ms",
+            }}
+          >
+            <ConversationPreview />
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }

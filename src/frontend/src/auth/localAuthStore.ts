@@ -11,10 +11,10 @@ export interface LocalSession {
   timestamp: number;
 }
 
-const DB_NAME = 'mindvault_auth';
+const DB_NAME = "mindvault_auth";
 const DB_VERSION = 1;
-const ACCOUNTS_STORE = 'accounts';
-const SESSION_STORE = 'session';
+const ACCOUNTS_STORE = "accounts";
+const SESSION_STORE = "session";
 
 class LocalAuthStore {
   private dbPromise: Promise<IDBDatabase>;
@@ -35,7 +35,7 @@ class LocalAuthStore {
 
         // Create accounts store
         if (!db.objectStoreNames.contains(ACCOUNTS_STORE)) {
-          db.createObjectStore(ACCOUNTS_STORE, { keyPath: 'username' });
+          db.createObjectStore(ACCOUNTS_STORE, { keyPath: "username" });
         }
 
         // Create session store
@@ -49,7 +49,7 @@ class LocalAuthStore {
   async saveAccount(account: LocalAccount): Promise<void> {
     const db = await this.dbPromise;
     return new Promise((resolve, reject) => {
-      const transaction = db.transaction([ACCOUNTS_STORE], 'readwrite');
+      const transaction = db.transaction([ACCOUNTS_STORE], "readwrite");
       const store = transaction.objectStore(ACCOUNTS_STORE);
       const request = store.put(account);
 
@@ -61,7 +61,7 @@ class LocalAuthStore {
   async getAccount(username: string): Promise<LocalAccount | null> {
     const db = await this.dbPromise;
     return new Promise((resolve, reject) => {
-      const transaction = db.transaction([ACCOUNTS_STORE], 'readonly');
+      const transaction = db.transaction([ACCOUNTS_STORE], "readonly");
       const store = transaction.objectStore(ACCOUNTS_STORE);
       const request = store.get(username);
 
@@ -73,9 +73,9 @@ class LocalAuthStore {
   async saveSession(session: LocalSession): Promise<void> {
     const db = await this.dbPromise;
     return new Promise((resolve, reject) => {
-      const transaction = db.transaction([SESSION_STORE], 'readwrite');
+      const transaction = db.transaction([SESSION_STORE], "readwrite");
       const store = transaction.objectStore(SESSION_STORE);
-      const request = store.put(session, 'current');
+      const request = store.put(session, "current");
 
       request.onsuccess = () => resolve();
       request.onerror = () => reject(request.error);
@@ -85,9 +85,9 @@ class LocalAuthStore {
   async getSession(): Promise<LocalSession | null> {
     const db = await this.dbPromise;
     return new Promise((resolve, reject) => {
-      const transaction = db.transaction([SESSION_STORE], 'readonly');
+      const transaction = db.transaction([SESSION_STORE], "readonly");
       const store = transaction.objectStore(SESSION_STORE);
-      const request = store.get('current');
+      const request = store.get("current");
 
       request.onsuccess = () => resolve(request.result || null);
       request.onerror = () => reject(request.error);
@@ -97,9 +97,9 @@ class LocalAuthStore {
   async clearSession(): Promise<void> {
     const db = await this.dbPromise;
     return new Promise((resolve, reject) => {
-      const transaction = db.transaction([SESSION_STORE], 'readwrite');
+      const transaction = db.transaction([SESSION_STORE], "readwrite");
       const store = transaction.objectStore(SESSION_STORE);
-      const request = store.delete('current');
+      const request = store.delete("current");
 
       request.onsuccess = () => resolve();
       request.onerror = () => reject(request.error);

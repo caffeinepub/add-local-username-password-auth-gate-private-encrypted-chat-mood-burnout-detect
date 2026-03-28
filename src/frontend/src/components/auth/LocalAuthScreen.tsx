@@ -1,22 +1,25 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Lock, User, AlertCircle } from 'lucide-react';
-import { useLocalAuth } from '@/hooks/useLocalAuth';
-import { getPasswordRequirementsText, getRotationWindowText } from '@/lib/security/passwordPolicy';
-import LocalCaptcha from './LocalCaptcha';
-import GoBackButton from '../navigation/GoBackButton';
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useLocalAuth } from "@/hooks/useLocalAuth";
+import {
+  getPasswordRequirementsText,
+  getRotationWindowText,
+} from "@/lib/security/passwordPolicy";
+import { AlertCircle, Loader2, Lock, User } from "lucide-react";
+import { useState } from "react";
+import GoBackButton from "../navigation/GoBackButton";
+import LocalCaptcha from "./LocalCaptcha";
 
 interface LocalAuthScreenProps {
   onGoBack?: () => void;
 }
 
 export default function LocalAuthScreen({ onGoBack }: LocalAuthScreenProps) {
-  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [captchaVerified, setCaptchaVerified] = useState(false);
   const [captchaKey, setCaptchaKey] = useState(0);
   const [localError, setLocalError] = useState<string | null>(null);
@@ -29,29 +32,29 @@ export default function LocalAuthScreen({ onGoBack }: LocalAuthScreenProps) {
     clearError();
 
     if (!captchaVerified) {
-      setLocalError('Please complete the security check');
+      setLocalError("Please complete the security check");
       return;
     }
 
     try {
-      if (mode === 'signup') {
+      if (mode === "signup") {
         await signUp(username, password);
       } else {
         await signIn(username, password);
       }
-    } catch (err) {
+    } catch (_err) {
       // Regenerate CAPTCHA on failed attempt
-      setCaptchaKey(prev => prev + 1);
+      setCaptchaKey((prev) => prev + 1);
       setCaptchaVerified(false);
     }
   };
 
   const toggleMode = () => {
-    setMode(mode === 'signin' ? 'signup' : 'signin');
-    setUsername('');
-    setPassword('');
+    setMode(mode === "signin" ? "signup" : "signin");
+    setUsername("");
+    setPassword("");
     setCaptchaVerified(false);
-    setCaptchaKey(prev => prev + 1);
+    setCaptchaKey((prev) => prev + 1);
     setLocalError(null);
     clearError();
   };
@@ -59,7 +62,7 @@ export default function LocalAuthScreen({ onGoBack }: LocalAuthScreenProps) {
   const displayError = error || localError;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0a0a0f] to-[#0f1419] flex items-center justify-center px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-b from-[#1a1a2e] to-[#16213e] flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md space-y-6">
         {/* Go back button at the top */}
         {onGoBack && (
@@ -74,20 +77,23 @@ export default function LocalAuthScreen({ onGoBack }: LocalAuthScreenProps) {
               <Lock className="w-8 h-8 text-accent" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-foreground">
-            {mode === 'signin' ? 'Welcome Back' : 'Create Account'}
+          <h1 className="text-3xl font-bold text-white">
+            {mode === "signin" ? "Welcome Back" : "Create Account"}
           </h1>
-          <p className="text-muted-foreground">
-            {mode === 'signin'
-              ? 'Sign in to access your secure MindVault space'
-              : 'Create a secure account to get started'}
+          <p className="text-white/80">
+            {mode === "signin"
+              ? "Sign in to access your secure MindVault space"
+              : "Create a secure account to get started"}
           </p>
         </div>
 
         <div className="bg-secondary/30 backdrop-blur-sm border border-border/50 rounded-2xl p-6 space-y-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username" className="flex items-center gap-2">
+              <Label
+                htmlFor="username"
+                className="flex items-center gap-2 text-white"
+              >
                 <User className="w-4 h-4" />
                 Username
               </Label>
@@ -105,7 +111,10 @@ export default function LocalAuthScreen({ onGoBack }: LocalAuthScreenProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="flex items-center gap-2">
+              <Label
+                htmlFor="password"
+                className="flex items-center gap-2 text-white"
+              >
                 <Lock className="w-4 h-4" />
                 Password
               </Label>
@@ -121,17 +130,19 @@ export default function LocalAuthScreen({ onGoBack }: LocalAuthScreenProps) {
               />
             </div>
 
-            {mode === 'signup' && (
+            {mode === "signup" && (
               <Alert className="bg-accent/10 border-accent/30">
-                <AlertCircle className="w-4 h-4" />
-                <AlertDescription className="text-xs space-y-1">
+                <AlertCircle className="w-4 h-4 text-white" />
+                <AlertDescription className="text-xs space-y-1 text-white">
                   <p className="font-semibold">Password Requirements:</p>
                   <ul className="list-disc list-inside space-y-0.5">
-                    {getPasswordRequirementsText().map((req, i) => (
-                      <li key={i}>{req}</li>
+                    {getPasswordRequirementsText().map((req) => (
+                      <li key={req}>{req}</li>
                     ))}
                   </ul>
-                  <p className="mt-2 text-muted-foreground">{getRotationWindowText()}</p>
+                  <p className="mt-2 text-white/70">
+                    {getRotationWindowText()}
+                  </p>
                 </AlertDescription>
               </Alert>
             )}
@@ -143,8 +154,10 @@ export default function LocalAuthScreen({ onGoBack }: LocalAuthScreenProps) {
 
             {displayError && (
               <Alert variant="destructive">
-                <AlertCircle className="w-4 h-4" />
-                <AlertDescription>{displayError}</AlertDescription>
+                <AlertCircle className="w-4 h-4 text-white" />
+                <AlertDescription className="text-white">
+                  {displayError}
+                </AlertDescription>
               </Alert>
             )}
 
@@ -156,10 +169,10 @@ export default function LocalAuthScreen({ onGoBack }: LocalAuthScreenProps) {
               {isLoading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                  {mode === 'signin' ? 'Signing in...' : 'Creating account...'}
+                  {mode === "signin" ? "Signing in..." : "Creating account..."}
                 </>
               ) : (
-                <>{mode === 'signin' ? 'Sign In' : 'Create Account'}</>
+                <>{mode === "signin" ? "Sign In" : "Create Account"}</>
               )}
             </Button>
           </form>
@@ -171,9 +184,9 @@ export default function LocalAuthScreen({ onGoBack }: LocalAuthScreenProps) {
               disabled={isLoading}
               className="text-sm text-accent hover:underline disabled:opacity-50"
             >
-              {mode === 'signin'
+              {mode === "signin"
                 ? "Don't have an account? Sign up"
-                : 'Already have an account? Sign in'}
+                : "Already have an account? Sign in"}
             </button>
           </div>
         </div>

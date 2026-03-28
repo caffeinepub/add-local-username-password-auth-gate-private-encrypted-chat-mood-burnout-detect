@@ -1,13 +1,16 @@
-import { useInView } from '../../lib/useInView';
-import { Button } from '../primitives/Button';
-import { usePrefersReducedMotion } from '../../lib/usePrefersReducedMotion';
+import { useInView } from "../../lib/useInView";
+import { usePrefersReducedMotion } from "../../lib/usePrefersReducedMotion";
+import { Button } from "../primitives/Button";
 
 interface FinalCTASectionProps {
   onStartMindVault?: () => void;
   onSubscriptionPlans?: () => void;
 }
 
-export default function FinalCTASection({ onStartMindVault, onSubscriptionPlans }: FinalCTASectionProps) {
+export default function FinalCTASection({
+  onStartMindVault,
+  onSubscriptionPlans,
+}: FinalCTASectionProps) {
   const { ref, isInView } = useInView({ threshold: 0.5 });
   const prefersReducedMotion = usePrefersReducedMotion();
 
@@ -15,7 +18,7 @@ export default function FinalCTASection({ onStartMindVault, onSubscriptionPlans 
     <section
       ref={ref}
       className={`relative py-32 px-4 overflow-hidden transition-all duration-700 ${
-        isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+        isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
       }`}
       aria-label="Final call to action"
     >
@@ -23,8 +26,11 @@ export default function FinalCTASection({ onStartMindVault, onSubscriptionPlans 
       <div
         className="absolute inset-0 opacity-30"
         style={{
-          background: 'radial-gradient(circle at center, rgba(34, 211, 238, 0.15) 0%, transparent 70%)',
-          animation: prefersReducedMotion ? 'none' : 'pulse-glow 4s ease-in-out infinite',
+          background:
+            "radial-gradient(circle at center, rgba(34, 211, 238, 0.15) 0%, transparent 70%)",
+          animation: prefersReducedMotion
+            ? "none"
+            : "pulse-glow 4s ease-in-out infinite",
         }}
         aria-hidden="true"
       />

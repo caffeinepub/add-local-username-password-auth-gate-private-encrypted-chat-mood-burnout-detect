@@ -1,47 +1,52 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Shield, Key, Loader2 } from 'lucide-react';
-import LocalAuthScreen from '../auth/LocalAuthScreen';
-import GoBackButton from '../navigation/GoBackButton';
-import ZoomTransition from '../motion/ZoomTransition';
-import { useInternetIdentity } from '@/hooks/useInternetIdentity';
+import { Button } from "@/components/ui/button";
+import { useInternetIdentity } from "@/hooks/useInternetIdentity";
+import { Key, Loader2, Shield } from "lucide-react";
+import { useState } from "react";
+import LocalAuthScreen from "../auth/LocalAuthScreen";
+import ZoomTransition from "../motion/ZoomTransition";
+import GoBackButton from "../navigation/GoBackButton";
 
 interface ExperienceEntryGateProps {
   onAuthenticated: () => void;
   onGoBack?: () => void;
 }
 
-export default function ExperienceEntryGate({ onAuthenticated, onGoBack }: ExperienceEntryGateProps) {
-  const [authMode, setAuthMode] = useState<'choice' | 'local' | 'ii' | null>(null);
+export default function ExperienceEntryGate({
+  onAuthenticated,
+  onGoBack,
+}: ExperienceEntryGateProps) {
+  const [authMode, setAuthMode] = useState<"choice" | "local" | "ii" | null>(
+    null,
+  );
   const { login, loginStatus } = useInternetIdentity();
 
   const handleInternetIdentityLogin = async () => {
-    setAuthMode('ii');
+    setAuthMode("ii");
     try {
       await login();
       onAuthenticated();
     } catch (error) {
-      console.error('Internet Identity login failed:', error);
-      setAuthMode('choice');
+      console.error("Internet Identity login failed:", error);
+      setAuthMode("choice");
     }
   };
 
   const handleBackToChoice = () => {
-    setAuthMode('choice');
+    setAuthMode("choice");
   };
 
   // Show local auth screen
-  if (authMode === 'local') {
+  if (authMode === "local") {
     return <LocalAuthScreen onGoBack={handleBackToChoice} />;
   }
 
   // Show II loading state
-  if (authMode === 'ii' && loginStatus === 'logging-in') {
+  if (authMode === "ii" && loginStatus === "logging-in") {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#0a0a0f] to-[#0f1419] flex items-center justify-center px-4">
+      <div className="min-h-screen bg-gradient-to-b from-[#1a1a2e] to-[#16213e] flex items-center justify-center px-4">
         <div className="text-center space-y-4">
           <div className="w-16 h-16 border-4 border-accent/30 border-t-accent rounded-full animate-spin mx-auto" />
-          <p className="text-muted-foreground">Connecting to Internet Identity...</p>
+          <p className="text-white/80">Connecting to Internet Identity...</p>
         </div>
       </div>
     );
@@ -49,7 +54,7 @@ export default function ExperienceEntryGate({ onAuthenticated, onGoBack }: Exper
 
   // Show choice screen
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0a0a0f] to-[#0f1419] flex items-center justify-center px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-b from-[#1a1a2e] to-[#16213e] flex items-center justify-center px-4 py-8">
       <ZoomTransition className="w-full max-w-md space-y-6">
         {/* Go back button at the top */}
         {onGoBack && (
@@ -64,8 +69,10 @@ export default function ExperienceEntryGate({ onAuthenticated, onGoBack }: Exper
               <Shield className="w-8 h-8 text-accent" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-foreground">Choose Your Login Method</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-3xl font-bold text-white">
+            Choose Your Login Method
+          </h1>
+          <p className="text-white/80">
             Select how you'd like to access your secure MindVault space
           </p>
         </div>
@@ -73,8 +80,9 @@ export default function ExperienceEntryGate({ onAuthenticated, onGoBack }: Exper
         <div className="space-y-4">
           {/* Internet Identity Option */}
           <button
+            type="button"
             onClick={handleInternetIdentityLogin}
-            disabled={loginStatus === 'logging-in'}
+            disabled={loginStatus === "logging-in"}
             className="w-full bg-secondary/30 backdrop-blur-sm border border-border/50 rounded-2xl p-6 hover:border-accent/50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group"
           >
             <div className="flex items-start gap-4">
@@ -82,11 +90,12 @@ export default function ExperienceEntryGate({ onAuthenticated, onGoBack }: Exper
                 <Shield className="w-6 h-6 text-accent" />
               </div>
               <div className="text-left flex-1">
-                <h3 className="text-lg font-semibold text-foreground mb-1">
+                <h3 className="text-lg font-semibold text-white mb-1">
                   Internet Identity
                 </h3>
-                <p className="text-sm text-muted-foreground">
-                  Secure blockchain-based authentication. No passwords to remember.
+                <p className="text-sm text-white/70">
+                  Secure blockchain-based authentication. No passwords to
+                  remember.
                 </p>
               </div>
             </div>
@@ -94,7 +103,8 @@ export default function ExperienceEntryGate({ onAuthenticated, onGoBack }: Exper
 
           {/* Local Username/Password Option */}
           <button
-            onClick={() => setAuthMode('local')}
+            type="button"
+            onClick={() => setAuthMode("local")}
             className="w-full bg-secondary/30 backdrop-blur-sm border border-border/50 rounded-2xl p-6 hover:border-accent/50 transition-all duration-300 group"
           >
             <div className="flex items-start gap-4">
@@ -102,18 +112,19 @@ export default function ExperienceEntryGate({ onAuthenticated, onGoBack }: Exper
                 <Key className="w-6 h-6 text-accent" />
               </div>
               <div className="text-left flex-1">
-                <h3 className="text-lg font-semibold text-foreground mb-1">
+                <h3 className="text-lg font-semibold text-white mb-1">
                   Username & Password
                 </h3>
-                <p className="text-sm text-muted-foreground">
-                  Traditional login with enhanced security features and CAPTCHA verification.
+                <p className="text-sm text-white/70">
+                  Traditional login with enhanced security features and CAPTCHA
+                  verification.
                 </p>
               </div>
             </div>
           </button>
         </div>
 
-        <div className="text-center text-xs text-muted-foreground">
+        <div className="text-center text-xs text-white/60">
           <p>Both methods provide secure, encrypted access to your data</p>
         </div>
       </ZoomTransition>

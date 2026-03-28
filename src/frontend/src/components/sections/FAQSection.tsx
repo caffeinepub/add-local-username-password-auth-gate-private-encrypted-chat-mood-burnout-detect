@@ -3,69 +3,98 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion';
-import { useInView } from '../../lib/useInView';
-import Section from '../primitives/Section';
+} from "@/components/ui/accordion";
+import { useInView } from "@/lib/useInView";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 
 const faqs = [
   {
-    question: 'Is this really anonymous?',
-    answer: 'Yes, completely. MindVault does not collect, store, or require any identifying information. No email, no phone number, no name. Your conversations are encrypted and not tied to any personal identity. Even if you choose to connect with a therapist, you control what information you share and when.'
+    question: "Is MindVault really anonymous?",
+    answer:
+      "Yes, MindVault is designed with anonymity at its core. You can use the platform without providing any personal information. All conversations are encrypted end-to-end, and we never track or store identifying data.",
   },
   {
-    question: 'When will I talk to a real person?',
-    answer: 'You decide. The AI companion is available immediately for support, guidance, and self-regulation tools. If you feel you would benefit from speaking with a licensed therapist, the AI can facilitate that connection at any time. There is no pressure—you move at your own pace.'
+    question: "How does the AI analysis work?",
+    answer:
+      "Our AI uses natural language processing to analyze your messages and detect emotional patterns. It provides immediate insights and reassurance based on your mood. However, all AI analysis is reviewed by licensed therapists to ensure accuracy and safety.",
   },
   {
-    question: 'What if I am in crisis?',
-    answer: 'If you are experiencing a mental health emergency, MindVault will recognize the urgency and immediately provide crisis resources, including hotlines and emergency services. The AI is designed to detect crisis indicators and prioritize your immediate safety above all else.'
+    question: "Can I talk to a real therapist?",
+    answer:
+      "Absolutely. While our AI provides immediate support, you can request a session with a licensed therapist at any time. We believe in a blended care model that combines AI efficiency with human expertise.",
   },
   {
-    question: 'How does the AI understand what I am feeling?',
-    answer: 'The AI uses advanced natural language processing to recognize emotional patterns, context, and intensity in what you share. It is trained on empathetic communication and mental health frameworks, but it is not a replacement for human care—it is a bridge to help you understand yourself and access the right support.'
+    question: "What if I am in crisis?",
+    answer:
+      "If you are experiencing a mental health crisis, please call your local emergency services or a crisis hotline immediately. MindVault is designed for ongoing support and is not a substitute for emergency care.",
   },
   {
-    question: 'Can my employer see my conversations?',
-    answer: 'No. Even if your organization provides access to MindVault as a benefit, your conversations remain completely private. Employers receive only anonymized, aggregated insights about overall wellbeing trends—never individual data or identifiable information.'
+    question: "How much does MindVault cost?",
+    answer:
+      "Your first session is completely free. After that, we offer flexible pricing plans starting at ₹200 for a single session, ₹800 for 4 sessions per month, or ₹1,600 for 12 sessions over 3 months.",
   },
   {
-    question: 'What makes this different from other mental health apps?',
-    answer: 'MindVault prioritizes anonymity from the first interaction. Many apps require accounts and collect data. We do not. We also focus on emotional triage—understanding the severity and nature of what you are experiencing—so we can guide you to the most appropriate support, whether that is self-help tools or professional care.'
-  }
+    question: "Is my data secure?",
+    answer:
+      "Yes, we use military-grade end-to-end encryption to protect all your data. Your conversations are encrypted on your device before being stored, and we never sell or share your information with third parties. We are HIPAA-compliant and follow the highest security standards.",
+  },
 ];
 
 export default function FAQSection() {
   const { ref, isInView } = useInView({ threshold: 0.1 });
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   return (
-    <Section
-      ref={ref}
-      eyebrow="FAQ"
-      title="Questions you might have"
-      description="Clear answers about how MindVault works"
-      className={`transition-all duration-700 ${
-        isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-      }`}
-      aria-label="Frequently asked questions"
-    >
-      <div className="max-w-3xl mx-auto">
-        <Accordion type="single" collapsible className="space-y-4">
-          {faqs.map((faq, index) => (
-            <AccordionItem
-              key={index}
-              value={`item-${index}`}
-              className="glass-card px-6 border-0"
-            >
-              <AccordionTrigger className="text-left text-lg font-semibold text-foreground hover:text-accent transition-colors py-6">
-                {faq.question}
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground leading-relaxed pb-6">
-                {faq.answer}
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
+    <section id="faq-section" ref={ref} className="py-24 px-4 bg-background">
+      <div className="max-w-4xl mx-auto">
+        <div
+          className="text-center mb-12"
+          style={{
+            opacity: isInView ? 1 : 0,
+            transform: isInView ? "translateY(0)" : "translateY(20px)",
+            transition: prefersReducedMotion
+              ? "none"
+              : "opacity 0.6s ease-out, transform 0.6s ease-out",
+          }}
+        >
+          <p className="text-accent font-semibold mb-2 uppercase tracking-wide text-sm">
+            FAQ
+          </p>
+          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+            Frequently Asked Questions
+          </h2>
+          <p className="text-lg text-muted-foreground">
+            Everything you need to know about MindVault
+          </p>
+        </div>
+
+        <div
+          style={{
+            opacity: isInView ? 1 : 0,
+            transform: isInView ? "translateY(0)" : "translateY(20px)",
+            transition: prefersReducedMotion
+              ? "none"
+              : "opacity 0.6s ease-out 200ms, transform 0.6s ease-out 200ms",
+          }}
+        >
+          <Accordion type="single" collapsible className="w-full space-y-4">
+            {faqs.map((faq, index) => (
+              <AccordionItem
+                key={faq.question}
+                value={`item-${index}`}
+                className="border border-border/50 rounded-lg px-6 bg-card/50 backdrop-blur-sm"
+              >
+                <AccordionTrigger className="text-left text-foreground hover:text-accent transition-colors">
+                  {faq.question}
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  {faq.answer}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
       </div>
-    </Section>
+    </section>
   );
 }

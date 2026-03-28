@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
-import { usePrefersReducedMotion } from '../../lib/usePrefersReducedMotion';
+import { useEffect, useRef } from "react";
+import { usePrefersReducedMotion } from "../../lib/usePrefersReducedMotion";
 
 interface Particle {
   x: number;
@@ -21,7 +21,7 @@ export default function NeuralParticlesOverlay() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     // Set canvas size
@@ -30,16 +30,19 @@ export default function NeuralParticlesOverlay() {
       canvas.height = window.innerHeight;
     };
     resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener("resize", resizeCanvas);
 
     // Initialize particles
-    const particleCount = Math.min(50, Math.floor((canvas.width * canvas.height) / 20000));
+    const particleCount = Math.min(
+      50,
+      Math.floor((canvas.width * canvas.height) / 20000),
+    );
     particlesRef.current = Array.from({ length: particleCount }, () => ({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
       vx: (Math.random() - 0.5) * 0.3,
       vy: (Math.random() - 0.5) * 0.3,
-      connections: []
+      connections: [],
     }));
 
     // Animation loop
@@ -66,15 +69,15 @@ export default function NeuralParticlesOverlay() {
         particle.y = Math.max(0, Math.min(canvas.height, particle.y));
 
         // Draw particle - Brighter and larger
-        ctx.fillStyle = 'rgba(34, 211, 238, 0.75)';
+        ctx.fillStyle = "rgba(34, 211, 238, 0.75)";
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, 3.5, 0, Math.PI * 2);
         ctx.fill();
 
         // Add glow effect to particles
         ctx.shadowBlur = 8;
-        ctx.shadowColor = 'rgba(34, 211, 238, 0.6)';
-        ctx.fillStyle = 'rgba(34, 211, 238, 0.9)';
+        ctx.shadowColor = "rgba(34, 211, 238, 0.6)";
+        ctx.fillStyle = "rgba(34, 211, 238, 0.9)";
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, 3.5, 0, Math.PI * 2);
         ctx.fill();
@@ -107,7 +110,7 @@ export default function NeuralParticlesOverlay() {
     animate();
 
     return () => {
-      window.removeEventListener('resize', resizeCanvas);
+      window.removeEventListener("resize", resizeCanvas);
       if (animationFrameRef.current !== undefined) {
         cancelAnimationFrame(animationFrameRef.current);
       }
@@ -120,8 +123,7 @@ export default function NeuralParticlesOverlay() {
     <canvas
       ref={canvasRef}
       className="absolute inset-0 pointer-events-none z-20"
-      style={{ mixBlendMode: 'screen', opacity: 0.7 }}
-      aria-hidden="true"
+      style={{ mixBlendMode: "screen", opacity: 0.7 }}
     />
   );
 }

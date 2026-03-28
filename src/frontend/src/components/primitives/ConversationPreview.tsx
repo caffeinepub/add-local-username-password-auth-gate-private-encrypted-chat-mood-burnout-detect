@@ -1,4 +1,4 @@
-import { usePrefersReducedMotion } from '../../lib/usePrefersReducedMotion';
+import { usePrefersReducedMotion } from "../../lib/usePrefersReducedMotion";
 
 export interface ConversationPreviewProps {
   preview?: {
@@ -7,17 +7,20 @@ export interface ConversationPreviewProps {
   };
 }
 
-export default function ConversationPreview({ preview }: ConversationPreviewProps) {
+export default function ConversationPreview({
+  preview,
+}: ConversationPreviewProps) {
   const prefersReducedMotion = usePrefersReducedMotion();
 
   if (!preview) return null;
 
   return (
-    <div
+    <section
       className={`mt-12 max-w-2xl mx-auto glass-card p-6 space-y-4 transition-all ${
-        prefersReducedMotion ? '' : 'duration-500 animate-in fade-in slide-in-from-bottom-4'
+        prefersReducedMotion
+          ? ""
+          : "duration-500 animate-in fade-in slide-in-from-bottom-4"
       }`}
-      role="region"
       aria-label="Example conversation"
     >
       <div className="flex justify-end">
@@ -30,6 +33,6 @@ export default function ConversationPreview({ preview }: ConversationPreviewProp
           <p className="text-sm">{preview.ai}</p>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

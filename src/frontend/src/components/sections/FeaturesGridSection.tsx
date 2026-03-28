@@ -1,40 +1,44 @@
-import { Heart, UserX, Stethoscope, Flame, AlertTriangle, Wind } from 'lucide-react';
-import { useInView } from '../../lib/useInView';
-import Section from '../primitives/Section';
-import GlassCard from '../primitives/GlassCard';
-import { usePrefersReducedMotion } from '../../lib/usePrefersReducedMotion';
+import { useInView } from "@/lib/useInView";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
+import { Brain, Clock, Heart, Lock, Shield, Users } from "lucide-react";
+import GlassCard from "../primitives/GlassCard";
 
 const features = [
   {
+    icon: Shield,
+    title: "Complete Privacy",
+    description:
+      "Your conversations are encrypted and never shared. Anonymous by default.",
+  },
+  {
+    icon: Lock,
+    title: "End-to-End Encryption",
+    description:
+      "Military-grade encryption ensures your data stays private and secure.",
+  },
+  {
+    icon: Brain,
+    title: "AI-Powered Insights",
+    description:
+      "Get immediate feedback and mood analysis powered by advanced AI.",
+  },
+  {
+    icon: Clock,
+    title: "24/7 Availability",
+    description: "Access support whenever you need it, day or night.",
+  },
+  {
+    icon: Users,
+    title: "Professional Therapists",
+    description:
+      "Connect with licensed professionals when you need human support.",
+  },
+  {
     icon: Heart,
-    title: 'AI Emotional Companion',
-    description: 'A compassionate AI that listens without judgment, available whenever you need support.'
+    title: "Compassionate Care",
+    description:
+      "Receive empathetic, judgment-free support tailored to your needs.",
   },
-  {
-    icon: UserX,
-    title: 'Complete Anonymity',
-    description: 'No names, no emails, no identity required. Your privacy is absolute and protected.'
-  },
-  {
-    icon: Stethoscope,
-    title: 'Licensed Therapist Access',
-    description: 'Connect with qualified mental health professionals when you are ready for human support.'
-  },
-  {
-    icon: Flame,
-    title: 'Burnout Detection',
-    description: 'Early identification of burnout patterns helps you address issues before they escalate.'
-  },
-  {
-    icon: AlertTriangle,
-    title: 'Crisis-Aware Escalation',
-    description: 'Intelligent recognition of urgent situations with immediate pathways to appropriate care.'
-  },
-  {
-    icon: Wind,
-    title: 'Self-Regulation Tools',
-    description: 'Guided breathing, grounding exercises, and coping strategies available on demand.'
-  }
 ];
 
 export default function FeaturesGridSection() {
@@ -42,43 +46,56 @@ export default function FeaturesGridSection() {
   const prefersReducedMotion = usePrefersReducedMotion();
 
   return (
-    <Section
+    <section
+      id="features-section"
       ref={ref}
-      eyebrow="Features"
-      title="Support designed for your wellbeing"
-      description="Every feature built with privacy, safety, and care in mind"
-      aria-label="Features"
+      className="py-24 px-4 bg-background"
     >
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
-        {features.map((feature, index) => {
-          const Icon = feature.icon;
-          const delay = prefersReducedMotion ? 0 : index * 100;
-          
-          return (
-            <div
-              key={feature.title}
-              className={`transition-all duration-500 ${
-                isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-              }`}
-              style={{ transitionDelay: `${delay}ms` }}
-            >
-              <GlassCard className="p-6 h-full space-y-4">
-                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-accent/20 text-accent">
-                  <Icon className="w-6 h-6" aria-hidden="true" />
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-16">
+          <p className="text-accent font-semibold mb-2 uppercase tracking-wide text-sm">
+            Features
+          </p>
+          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+            Everything You Need for Mental Wellness
+          </h2>
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+            MindVault combines cutting-edge technology with human expertise to
+            provide comprehensive mental health support.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {features.map((feature, index) => {
+            const Icon = feature.icon;
+            const delay = prefersReducedMotion ? 0 : index * 100;
+
+            return (
+              <GlassCard
+                key={feature.title}
+                className="p-6 hover:shadow-lg transition-shadow"
+                style={{
+                  opacity: isInView ? 1 : 0,
+                  transform: isInView ? "translateY(0)" : "translateY(20px)",
+                  transition: prefersReducedMotion
+                    ? "none"
+                    : `opacity 0.6s ease-out ${delay}ms, transform 0.6s ease-out ${delay}ms`,
+                }}
+              >
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mb-4">
+                    <Icon className="w-8 h-8 text-accent" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-foreground mb-2">
+                    {feature.title}
+                  </h3>
+                  <p className="text-muted-foreground">{feature.description}</p>
                 </div>
-                
-                <h3 className="text-lg font-semibold text-foreground">
-                  {feature.title}
-                </h3>
-                
-                <p className="text-muted-foreground leading-relaxed">
-                  {feature.description}
-                </p>
               </GlassCard>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
-    </Section>
+    </section>
   );
 }

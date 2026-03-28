@@ -1,5 +1,5 @@
-import { MoodCategory } from '../backend';
-import { pickRandomTemplate, getFallbackTemplate } from './moodPresets';
+import { MoodCategory } from "../backend";
+import { getFallbackTemplate, pickRandomTemplate } from "./moodPresets";
 
 export interface MoodInsight {
   category: MoodCategory;
@@ -9,14 +9,20 @@ export interface MoodInsight {
 
 export function generateMoodInsight(
   category: MoodCategory,
-  templates: string[] | null
+  templates: string[] | null | undefined,
 ): MoodInsight {
   let reassuranceMessage: string;
 
-  if (templates && templates.length > 0) {
+  // Harden template selection to handle empty/undefined arrays
+  if (templates && Array.isArray(templates) && templates.length > 0) {
     reassuranceMessage = pickRandomTemplate(templates);
   } else {
-    // Fallback if templates are unavailable
+    // Fallback if templates are unavailable, empty, or invalid
+    reassuranceMessage = getFallbackTemplate(category);
+  }
+
+  // Ensure we always have a message
+  if (!reassuranceMessage) {
     reassuranceMessage = getFallbackTemplate(category);
   }
 
@@ -32,16 +38,16 @@ export function generateMoodInsight(
 function getCategoryLabelForInsight(category: MoodCategory): string {
   switch (category) {
     case MoodCategory.anxiety:
-      return 'Anxiety';
+      return "Anxiety";
     case MoodCategory.depression:
-      return 'Depression';
+      return "Depression";
     case MoodCategory.stress:
-      return 'Stress';
+      return "Stress";
     case MoodCategory.positive:
-      return 'Positive';
+      return "Positive";
     case MoodCategory.neutral:
-      return 'Neutral';
+      return "Neutral";
     default:
-      return 'Neutral';
+      return "Neutral";
   }
 }

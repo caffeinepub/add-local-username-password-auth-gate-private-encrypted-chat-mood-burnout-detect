@@ -1,6 +1,6 @@
-import { type ReactNode, useEffect, useState } from 'react';
-import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
-import { ZOOM_CONFIG } from '@/lib/motion';
+import { ZOOM_CONFIG } from "@/lib/motion";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
+import { type ReactNode, useEffect, useState } from "react";
 
 interface ZoomPageTransitionProps {
   showExperience: boolean;
@@ -15,20 +15,20 @@ export default function ZoomPageTransition({
   experienceContent,
   onTransitionComplete,
 }: ZoomPageTransitionProps) {
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const [currentView, setCurrentView] = useState<'landing' | 'experience'>(
-    showExperience ? 'experience' : 'landing'
+  const [_isTransitioning, setIsTransitioning] = useState(false);
+  const [currentView, setCurrentView] = useState<"landing" | "experience">(
+    showExperience ? "experience" : "landing",
   );
   const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
-    const targetView = showExperience ? 'experience' : 'landing';
-    
+    const targetView = showExperience ? "experience" : "landing";
+
     if (currentView !== targetView) {
       setIsTransitioning(true);
-      
+
       const duration = prefersReducedMotion ? 150 : ZOOM_CONFIG.page.duration;
-      
+
       const timer = setTimeout(() => {
         setCurrentView(targetView);
         setIsTransitioning(false);
@@ -39,16 +39,18 @@ export default function ZoomPageTransition({
     }
   }, [showExperience, currentView, prefersReducedMotion, onTransitionComplete]);
 
-  const getViewStyle = (view: 'landing' | 'experience') => {
+  const getViewStyle = (view: "landing" | "experience") => {
     const isActive = currentView === view;
-    const isTarget = showExperience ? view === 'experience' : view === 'landing';
+    const isTarget = showExperience
+      ? view === "experience"
+      : view === "landing";
 
     if (prefersReducedMotion) {
       return {
         opacity: isActive ? 1 : 0,
-        transform: 'scale(1)',
-        transition: `opacity 150ms ease-out`,
-        pointerEvents: isActive ? ('auto' as const) : ('none' as const),
+        transform: "scale(1)",
+        transition: "opacity 150ms ease-out",
+        pointerEvents: isActive ? ("auto" as const) : ("none" as const),
       };
     }
 
@@ -65,7 +67,7 @@ export default function ZoomPageTransition({
       opacity,
       transform: `scale(${scale})`,
       transition: `opacity ${ZOOM_CONFIG.page.duration}ms ${ZOOM_CONFIG.page.easing}, transform ${ZOOM_CONFIG.page.duration}ms ${ZOOM_CONFIG.page.easing}`,
-      pointerEvents: isActive ? ('auto' as const) : ('none' as const),
+      pointerEvents: isActive ? ("auto" as const) : ("none" as const),
     };
   };
 
@@ -74,12 +76,12 @@ export default function ZoomPageTransition({
       {/* Landing Page Layer */}
       <div
         style={{
-          ...getViewStyle('landing'),
-          position: currentView === 'landing' ? 'relative' : 'absolute',
+          ...getViewStyle("landing"),
+          position: currentView === "landing" ? "relative" : "absolute",
           top: 0,
           left: 0,
           right: 0,
-          zIndex: currentView === 'landing' ? 1 : 0,
+          zIndex: currentView === "landing" ? 1 : 0,
         }}
       >
         {landingContent}
@@ -88,12 +90,12 @@ export default function ZoomPageTransition({
       {/* Experience Layer */}
       <div
         style={{
-          ...getViewStyle('experience'),
-          position: currentView === 'experience' ? 'relative' : 'absolute',
+          ...getViewStyle("experience"),
+          position: currentView === "experience" ? "relative" : "absolute",
           top: 0,
           left: 0,
           right: 0,
-          zIndex: currentView === 'experience' ? 1 : 0,
+          zIndex: currentView === "experience" ? 1 : 0,
         }}
       >
         {experienceContent}

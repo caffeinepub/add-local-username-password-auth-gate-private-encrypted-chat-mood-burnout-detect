@@ -1,63 +1,103 @@
-import { ShieldCheck, Lock, Ban, Scale } from 'lucide-react';
-import { useInView } from '../../lib/useInView';
-import Section from '../primitives/Section';
+import { useInView } from "@/lib/useInView";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
+import { Eye, FileCheck, Lock, Shield } from "lucide-react";
 
-const privacyPoints = [
+const privacyCommitments = [
   {
-    icon: ShieldCheck,
-    text: 'No identity storage'
+    icon: Shield,
+    text: "Your data is never sold or shared with third parties",
   },
   {
     icon: Lock,
-    text: 'End-to-end encryption'
+    text: "End-to-end encryption protects all your conversations",
   },
   {
-    icon: Ban,
-    text: 'No ads, no data resale'
+    icon: Eye,
+    text: "Anonymous by default - no personal information required",
   },
   {
-    icon: Scale,
-    text: 'Ethical AI boundaries'
-  }
+    icon: FileCheck,
+    text: "HIPAA-compliant security standards",
+  },
 ];
 
 export default function PrivacyTrustSection() {
-  const { ref, isInView } = useInView({ threshold: 0.3 });
+  const { ref, isInView } = useInView({ threshold: 0.2 });
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   return (
-    <Section
-      ref={ref}
-      eyebrow="Privacy & Trust"
-      title="Your privacy is our foundation"
-      description="Built on principles of anonymity and ethical care"
-      className={`transition-all duration-700 ${
-        isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-      }`}
-      aria-label="Privacy and trust"
-    >
-      <div className="max-w-4xl mx-auto">
-        <ul className="grid sm:grid-cols-2 gap-6 mb-12" role="list">
-          {privacyPoints.map((point) => {
-            const Icon = point.icon;
-            return (
-              <li key={point.text} className="flex items-start gap-4">
-                <div className="shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-accent/20 text-accent">
-                  <Icon className="w-5 h-5" aria-hidden="true" />
-                </div>
-                <span className="text-lg text-foreground pt-1.5">{point.text}</span>
-              </li>
-            );
-          })}
-        </ul>
+    <section id="privacy-section" ref={ref} className="py-24 px-4 bg-muted/30">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Text content */}
+          <div
+            style={{
+              opacity: isInView ? 1 : 0,
+              transform: isInView ? "translateX(0)" : "translateX(-20px)",
+              transition: prefersReducedMotion
+                ? "none"
+                : "opacity 0.8s ease-out, transform 0.8s ease-out",
+            }}
+          >
+            <p className="text-accent font-semibold mb-2 uppercase tracking-wide text-sm">
+              Privacy & Trust
+            </p>
+            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+              Your Privacy is Our Priority
+            </h2>
+            <p className="text-lg text-muted-foreground mb-8">
+              We understand that mental health is deeply personal. That's why
+              we've built MindVault with privacy and security at its core.
+            </p>
 
-        <div className="flex justify-center">
-          <img
-            src="/assets/generated/mindvault-trust-badge.dim_512x512.png"
-            alt="MindVault privacy commitment badge - illustrative representation of our dedication to user privacy and ethical AI practices"
-            className="w-32 h-32 object-contain opacity-80"
-          />
+            <ul className="space-y-4">
+              {privacyCommitments.map((commitment, index) => {
+                const Icon = commitment.icon;
+                const delay = prefersReducedMotion ? 0 : index * 100;
+
+                return (
+                  <li
+                    key={commitment.text}
+                    className="flex items-start gap-3"
+                    style={{
+                      opacity: isInView ? 1 : 0,
+                      transform: isInView
+                        ? "translateX(0)"
+                        : "translateX(-10px)",
+                      transition: prefersReducedMotion
+                        ? "none"
+                        : `opacity 0.6s ease-out ${delay + 200}ms, transform 0.6s ease-out ${delay + 200}ms`,
+                    }}
+                  >
+                    <div className="shrink-0 w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center mt-0.5">
+                      <Icon className="w-4 h-4 text-accent" />
+                    </div>
+                    <span className="text-foreground">{commitment.text}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+
+          {/* Trust badge illustration */}
+          <div
+            className="flex items-center justify-center"
+            style={{
+              opacity: isInView ? 1 : 0,
+              transform: isInView ? "translateX(0)" : "translateX(20px)",
+              transition: prefersReducedMotion
+                ? "none"
+                : "opacity 0.8s ease-out 200ms, transform 0.8s ease-out 200ms",
+            }}
+          >
+            <img
+              src="/assets/generated/mindvault-trust-badge.dim_512x512.png"
+              alt="Trust and security badge"
+              className="w-full max-w-md h-auto"
+            />
+          </div>
         </div>
       </div>
-    </Section>
+    </section>
   );
 }

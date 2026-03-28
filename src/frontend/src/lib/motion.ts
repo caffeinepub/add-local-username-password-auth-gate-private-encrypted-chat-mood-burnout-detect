@@ -7,18 +7,23 @@ export const MOTION = {
     page: 600, // Page-level transitions
     component: 400, // Component-level zoom entries
   },
-  easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-  zoomEasing: 'cubic-bezier(0.34, 1.56, 0.64, 1)', // Dynamic bounce for zoom
+  easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+  zoomEasing: "cubic-bezier(0.34, 1.56, 0.64, 1)", // Dynamic bounce for zoom
 } as const;
 
 // Helper to get transition string
-export function getTransition(duration: keyof typeof MOTION.duration = 'normal'): string {
+export function getTransition(
+  duration: keyof typeof MOTION.duration = "normal",
+): string {
   return `${MOTION.duration[duration]}ms ${MOTION.easing}`;
 }
 
 // Zoom-specific transition helpers
-export function getZoomTransition(type: 'page' | 'component' = 'component'): string {
-  const duration = type === 'page' ? MOTION.duration.page : MOTION.duration.component;
+export function getZoomTransition(
+  type: "page" | "component" = "component",
+): string {
+  const duration =
+    type === "page" ? MOTION.duration.page : MOTION.duration.component;
   return `${duration}ms ${MOTION.zoomEasing}`;
 }
 
@@ -26,15 +31,15 @@ export function getZoomStyles(isActive: boolean, reducedMotion: boolean) {
   if (reducedMotion) {
     return {
       opacity: isActive ? 1 : 0,
-      transform: 'scale(1)',
+      transform: "scale(1)",
       transition: `opacity ${MOTION.duration.fast}ms ${MOTION.easing}`,
     };
   }
 
   return {
     opacity: isActive ? 1 : 0,
-    transform: isActive ? 'scale(1)' : 'scale(0.95)',
-    transition: `opacity ${getZoomTransition('component')}, transform ${getZoomTransition('component')}`,
+    transform: isActive ? "scale(1)" : "scale(0.95)",
+    transition: `opacity ${getZoomTransition("component")}, transform ${getZoomTransition("component")}`,
   };
 }
 

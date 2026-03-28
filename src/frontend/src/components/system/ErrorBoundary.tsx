@@ -1,5 +1,5 @@
-import { Component, type ReactNode, type ErrorInfo } from 'react';
-import { Button } from '../primitives/Button';
+import { Component, type ErrorInfo, type ReactNode } from "react";
+import { Button } from "../primitives/Button";
 
 interface Props {
   children: ReactNode;
@@ -21,7 +21,7 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Error caught by boundary:', error, errorInfo);
+    console.error("Error caught by boundary:", error, errorInfo);
   }
 
   handleRetry = () => {
@@ -38,14 +38,19 @@ export default class ErrorBoundary extends Component<Props, State> {
                 Something unexpected happened
               </h1>
               <p className="text-muted-foreground">
-                We encountered an issue loading this page. This isn't your fault—please try again.
+                We encountered an issue loading this page. This isn't your
+                fault—please try again.
               </p>
             </div>
-            
-            <Button variant="primary" onClick={this.handleRetry} className="w-full">
+
+            <Button
+              variant="primary"
+              onClick={this.handleRetry}
+              className="w-full"
+            >
               Try Again
             </Button>
-            
+
             <p className="text-sm text-muted-foreground">
               If this continues, please refresh your browser.
             </p>
