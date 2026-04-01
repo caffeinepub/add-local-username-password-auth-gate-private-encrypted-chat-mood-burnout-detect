@@ -10,6 +10,46 @@ interface MoodInsightCalloutProps {
   className?: string;
 }
 
+function getCategoryStyle(category: MoodCategory) {
+  switch (category) {
+    case MoodCategory.anxiety:
+      return {
+        icon: Brain,
+        iconColor: "oklch(0.78 0.18 70)",
+        titleColor: "oklch(0.85 0.15 70)",
+        borderStyle: "2px solid oklch(0.78 0.18 70 / 0.4)",
+      };
+    case MoodCategory.depression:
+      return {
+        icon: Heart,
+        iconColor: "oklch(0.72 0.2 240)",
+        titleColor: "oklch(0.80 0.18 240)",
+        borderStyle: "2px solid oklch(0.72 0.2 240 / 0.4)",
+      };
+    case MoodCategory.stress:
+      return {
+        icon: Brain,
+        iconColor: "oklch(0.68 0.22 28)",
+        titleColor: "oklch(0.78 0.18 28)",
+        borderStyle: "2px solid oklch(0.68 0.22 28 / 0.4)",
+      };
+    case MoodCategory.positive:
+      return {
+        icon: Sparkles,
+        iconColor: "oklch(0.72 0.2 155)",
+        titleColor: "oklch(0.80 0.18 155)",
+        borderStyle: "2px solid oklch(0.72 0.2 155 / 0.4)",
+      };
+    default:
+      return {
+        icon: Minus,
+        iconColor: "oklch(0.75 0.06 270)",
+        titleColor: "oklch(0.85 0.04 270)",
+        borderStyle: "2px solid oklch(0.75 0.06 270 / 0.4)",
+      };
+  }
+}
+
 export default function MoodInsightCallout({
   category,
   categoryLabel,
@@ -18,78 +58,31 @@ export default function MoodInsightCallout({
 }: MoodInsightCalloutProps) {
   const {
     icon: Icon,
-    colorClass,
-    gradientClass,
-    borderClass,
+    iconColor,
+    titleColor,
+    borderStyle,
   } = getCategoryStyle(category);
 
   return (
     <Alert
       className={cn(
-        "popup-surface border-0 p-8 space-y-4 shadow-2xl animate-modal-entrance",
-        borderClass,
+        "popup-surface p-8 space-y-4 shadow-2xl animate-modal-entrance",
         className,
       )}
+      style={{ border: borderStyle }}
     >
-      <Icon className={cn("h-10 w-10", colorClass)} />
-      <AlertTitle className="flex items-center gap-3">
-        <span
-          className={cn(
-            "popup-text-gradient text-3xl font-bold",
-            gradientClass,
-          )}
-        >
+      <Icon className="h-10 w-10" style={{ color: iconColor }} />
+      <AlertTitle>
+        <span className="text-3xl font-bold" style={{ color: titleColor }}>
           Detected: {categoryLabel}
         </span>
       </AlertTitle>
-      <AlertDescription className="mt-4 text-xl leading-relaxed popup-text-high-contrast font-medium">
+      <AlertDescription
+        className="mt-4 text-xl leading-relaxed font-medium"
+        style={{ color: "oklch(0.92 0.03 240)" }}
+      >
         {reassuranceMessage}
       </AlertDescription>
     </Alert>
   );
-}
-
-function getCategoryStyle(category: MoodCategory) {
-  switch (category) {
-    case MoodCategory.anxiety:
-      return {
-        icon: Brain,
-        colorClass: "text-yellow-600 dark:text-yellow-400",
-        gradientClass:
-          "from-yellow-700 to-yellow-600 dark:from-yellow-400 dark:to-yellow-300",
-        borderClass: "ring-2 ring-yellow-500/30 dark:ring-yellow-400/30",
-      };
-    case MoodCategory.depression:
-      return {
-        icon: Heart,
-        colorClass: "text-blue-600 dark:text-blue-400",
-        gradientClass:
-          "from-blue-700 to-blue-600 dark:from-blue-400 dark:to-blue-300",
-        borderClass: "ring-2 ring-blue-500/30 dark:ring-blue-400/30",
-      };
-    case MoodCategory.stress:
-      return {
-        icon: Brain,
-        colorClass: "text-orange-600 dark:text-orange-400",
-        gradientClass:
-          "from-orange-700 to-orange-600 dark:from-orange-400 dark:to-orange-300",
-        borderClass: "ring-2 ring-orange-500/30 dark:ring-orange-400/30",
-      };
-    case MoodCategory.positive:
-      return {
-        icon: Sparkles,
-        colorClass: "text-green-600 dark:text-green-400",
-        gradientClass:
-          "from-green-700 to-green-600 dark:from-green-400 dark:to-green-300",
-        borderClass: "ring-2 ring-green-500/30 dark:ring-green-400/30",
-      };
-    default:
-      return {
-        icon: Minus,
-        colorClass: "text-gray-600 dark:text-gray-400",
-        gradientClass:
-          "from-gray-700 to-gray-600 dark:from-gray-400 dark:to-gray-300",
-        borderClass: "ring-2 ring-gray-500/30 dark:ring-gray-400/30",
-      };
-  }
 }
