@@ -12,7 +12,6 @@ export default function HeroSection({ onStartAnonymously }: HeroSectionProps) {
   const prefersReducedMotion = usePrefersReducedMotion();
   const heroRef = useRef<HTMLElement>(null);
 
-  // Direction-aware scroll opacity for background image
   const bgImageOpacity = useDirectionalScrollOpacity({
     elementRef: heroRef,
     minOpacity: 0.2,
@@ -125,13 +124,28 @@ export default function HeroSection({ onStartAnonymously }: HeroSectionProps) {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
-          <Button variant="primary" size="lg" onClick={onStartAnonymously}>
+          <Button
+            variant="primary"
+            size="lg"
+            onClick={onStartAnonymously}
+            style={{ color: "#ffffff" }}
+          >
             Start Anonymously
           </Button>
-          <Button variant="secondary" size="lg" onClick={handleHowItWorks}>
+          <Button
+            variant="secondary"
+            size="lg"
+            onClick={handleHowItWorks}
+            style={{ color: "#ffffff" }}
+          >
             How It Works
           </Button>
-          <Button variant="secondary" size="lg" onClick={handleAbout}>
+          <Button
+            variant="secondary"
+            size="lg"
+            onClick={handleAbout}
+            style={{ color: "#ffffff" }}
+          >
             About
           </Button>
         </div>

@@ -8,8 +8,6 @@ export default function CorporateBurnoutInsightSection() {
   return (
     <Section
       ref={ref}
-      eyebrow="Understanding Burnout"
-      title="Why anonymity matters in corporate environments"
       className={`transition-all duration-700 ${
         isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
       }`}
@@ -20,6 +18,19 @@ export default function CorporateBurnoutInsightSection() {
       aria-label="Corporate burnout insight"
     >
       <div className="max-w-4xl mx-auto space-y-8">
+        {/* Section header with forced white text */}
+        <div className="text-center mb-16 space-y-4">
+          <p
+            className="text-sm font-semibold uppercase tracking-wider"
+            style={{ color: "#ffffff" }}
+          >
+            Understanding Burnout
+          </p>
+          <h2 className="section-headline" style={{ color: "#ffffff" }}>
+            Why anonymity matters in corporate environments
+          </h2>
+        </div>
+
         <div className="prose prose-lg max-w-none space-y-6">
           <p
             className="leading-relaxed"
