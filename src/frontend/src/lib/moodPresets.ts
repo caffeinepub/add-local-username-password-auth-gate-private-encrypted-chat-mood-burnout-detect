@@ -106,8 +106,8 @@ export function getCategoryColor(category: MoodCategory): string {
     case MoodCategory.positive:
       return "text-green-500";
     case MoodCategory.neutral:
-      return "text-gray-500";
+      return "text-slate-300";
     default:
-      return "text-gray-500";
+      return "text-slate-300";
   }
 }
